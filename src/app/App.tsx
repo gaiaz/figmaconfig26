@@ -1228,9 +1228,7 @@ export default function App() {
   const SharedChrome = () => (
     <>
       {/* Toolbar */}
-      <div style={{ position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", alignItems: "center", gap: 12, padding: "10px 20px", borderRadius: 99, background: DARK }}>
-        <span style={{ color: "#fff", fontWeight: 900, fontSize: 13, letterSpacing: "-0.3px", fontFamily: F }}>Config Board</span>
-        <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.2)" }} />
+      <div style={{ position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", alignItems: "center", gap: 10, padding: "8px 12px 8px 16px", borderRadius: 99, background: DARK, whiteSpace: "nowrap" }}>
         <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.6)", fontFamily: F }}>
           {visibleCards.length}{filterSkills.length > 0 ? `/${cards.length}` : ""} partecipanti
         </span>
