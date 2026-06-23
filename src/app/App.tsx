@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Camera, Mail, Briefcase, Sparkles, ChevronRight,
   ArrowLeft, X, Plus,
-  SlidersHorizontal, Layers, LayoutGrid,
+  SlidersHorizontal, Layers, LayoutGrid, RotateCcw, RotateCw,
 } from "lucide-react";
 import HomeScreen from "@/imports/Home/index";
 import {
@@ -254,11 +254,12 @@ function StickerEl({ id, scale = 1 }: { id: string; scale?: number }) {
 
 // ─── Editable sticker — drag with one finger, pinch to scale, no control strip ─
 
-function EditableSticker({ sticker, onRemove, onMove, onScale, cardScale }: {
+function EditableSticker({ sticker, onRemove, onMove, onScale, onRotate, cardScale }: {
   sticker: PlacedSticker;
   onRemove: () => void;
   onMove: (x: number, y: number) => void;
   onScale: (factor: number) => void;
+  onRotate: (degrees: number) => void;
   cardScale: number;
 }) {
   const st = STICKER_MAP[sticker.type];
@@ -269,6 +270,7 @@ function EditableSticker({ sticker, onRemove, onMove, onScale, cardScale }: {
   const csRef  = useRef(cardScale); csRef.current  = cardScale;
   const omRef  = useRef(onMove);    omRef.current  = onMove;
   const osRef  = useRef(onScale);   osRef.current  = onScale;
+  const orRef  = useRef(onRotate);  orRef.current  = onRotate;
 
   // Native non-passive touch events for mobile pinch-to-scale + drag
   useEffect(() => {
@@ -276,7 +278,9 @@ function EditableSticker({ sticker, onRemove, onMove, onScale, cardScale }: {
     if (!el) return;
 
     let dist0: number | null = null;
+    let angle0: number | null = null;
     let dragStart: { px: number; py: number; sx: number; sy: number } | null = null;
+    const angle = (a: Touch, b: Touch) => Math.atan2(b.clientY - a.clientY, b.clientX - a.clientX) * 180 / Math.PI;
 
     const onTS = (e: TouchEvent) => {
       e.stopPropagation();
@@ -285,6 +289,7 @@ function EditableSticker({ sticker, onRemove, onMove, onScale, cardScale }: {
           e.touches[1].clientX - e.touches[0].clientX,
           e.touches[1].clientY - e.touches[0].clientY
         );
+        angle0 = angle(e.touches[0], e.touches[1]);
         dragStart = null;
       } else if (e.touches.length === 1) {
         const s = sRef.current;
@@ -302,7 +307,13 @@ function EditableSticker({ sticker, onRemove, onMove, onScale, cardScale }: {
         );
         const ratio = d / dist0;
         if (ratio > 0.75 && ratio < 1.4) osRef.current(ratio);
+        const a = angle(e.touches[0], e.touches[1]);
+        if (angle0 !== null) {
+          const delta = a - angle0;
+          if (Math.abs(delta) < 45) orRef.current(delta);
+        }
         dist0 = d;
+        angle0 = a;
       } else if (e.touches.length === 1 && dragStart) {
         const sc = csRef.current;
         const dx = (e.touches[0].clientX - dragStart.px) / sc;
@@ -312,7 +323,10 @@ function EditableSticker({ sticker, onRemove, onMove, onScale, cardScale }: {
     };
 
     const onTE = (e: TouchEvent) => {
-      if (e.touches.length < 2) dist0 = null;
+      if (e.touches.length < 2) {
+        dist0 = null;
+        angle0 = null;
+      }
       if (e.touches.length === 0) dragStart = null;
     };
 
@@ -358,18 +372,41 @@ function EditableSticker({ sticker, onRemove, onMove, onScale, cardScale }: {
           display: "flex", alignItems: "center", justifyContent: "center", zIndex: 20,
         }}
       >×</button>
+      <div style={{ position: "absolute", right: -8, bottom: -8, display: "flex", gap: 4, zIndex: 20 }}>
+        <button
+          onPointerDown={e => e.stopPropagation()}
+          onClick={e => { e.stopPropagation(); onRotate(-15); }}
+          aria-label="Ruota sticker a sinistra"
+          style={{
+            width: 22, height: 22, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.25)",
+            background: DARK, color: "#fff", cursor: "pointer", fontSize: 13, fontWeight: 800,
+            display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1,
+          }}
+        ><RotateCcw size={13} /></button>
+        <button
+          onPointerDown={e => e.stopPropagation()}
+          onClick={e => { e.stopPropagation(); onRotate(15); }}
+          aria-label="Ruota sticker a destra"
+          style={{
+            width: 22, height: 22, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.25)",
+            background: DARK, color: "#fff", cursor: "pointer", fontSize: 13, fontWeight: 800,
+            display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1,
+          }}
+        ><RotateCw size={13} /></button>
+      </div>
     </div>
   );
 }
 
 // ─── Portrait VCard ───────────────────────────────────────────────────────────
 
-function PortraitCard({ card, scale = 1, editMode = false, placedStickers, containerRef, onRemove, onMove, onScale }: {
+function PortraitCard({ card, scale = 1, editMode = false, placedStickers, containerRef, onRemove, onMove, onScale, onRotate }: {
   card: Omit<VCardData, "x"|"y"|"rotation">; scale?: number; editMode?: boolean;
   placedStickers?: PlacedSticker[]; containerRef?: React.RefObject<HTMLDivElement | null>;
   onRemove?: (id: string) => void;
   onMove?:   (id: string, x: number, y: number) => void;
   onScale?:  (id: string, factor: number) => void;
+  onRotate?: (id: string, degrees: number) => void;
 }) {
   const s = scale;
   const stickers = placedStickers ?? card.placedStickers;
@@ -388,12 +425,13 @@ function PortraitCard({ card, scale = 1, editMode = false, placedStickers, conta
         {/* Coloured header */}
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: HH * s, background: card.cardBg || card.accentColor, overflow: "hidden" }}>
           {stickers.map(st =>
-            editMode && containerRef && onRemove && onMove && onScale ? (
+            editMode && containerRef && onRemove && onMove && onScale && onRotate ? (
               <EditableSticker
                 key={st.instanceId} sticker={st}
                 onRemove={() => onRemove(st.instanceId)}
                 onMove={(x, y) => onMove(st.instanceId, x, y)}
                 onScale={f => onScale(st.instanceId, f)}
+                onRotate={degrees => onRotate(st.instanceId, degrees)}
                 cardScale={s}
               />
             ) : (
@@ -669,6 +707,7 @@ export default function App() {
   const removeSticker = (id: string) => setPlacedStickers(p => p.filter(s => s.instanceId !== id));
   const moveSticker   = (id: string, x: number, y: number) => setPlacedStickers(p => p.map(s => s.instanceId === id ? { ...s, x, y } : s));
   const scaleSticker  = (id: string, f: number)            => setPlacedStickers(p => p.map(s => s.instanceId === id ? { ...s, scale: Math.min(2.5, Math.max(0.35, s.scale * f)) } : s));
+  const rotateSticker = (id: string, degrees: number)      => setPlacedStickers(p => p.map(s => s.instanceId === id ? { ...s, rotation: s.rotation + degrees } : s));
 
   const uploadPhoto = useCallback(async (participantId: string) => {
     if (!supabase || !photoFile) return photo;
@@ -1022,7 +1061,7 @@ export default function App() {
                       card={{ id: "preview", name, photo, email, profession, interests, skills, futureInterests, futureBets, placedStickers, accentColor: cardBg, cardBg }}
                       scale={1.3}
                       editMode placedStickers={placedStickers} containerRef={cardEditorRef}
-                      onRemove={removeSticker} onMove={moveSticker} onScale={scaleSticker}
+                      onRemove={removeSticker} onMove={moveSticker} onScale={scaleSticker} onRotate={rotateSticker}
                     />
                   </div>
                 </motion.div>
@@ -1204,8 +1243,8 @@ export default function App() {
         <ArrowLeft size={13} />
       </button>
 
-      {/* Filter FAB — bottom right, 52×52 (#195/#196) */}
-      <div style={{ position: "fixed", bottom: 20, right: 20, zIndex: 40 }}>
+      {/* Filter FAB — lifted above bottom navigation on mobile */}
+      <div style={{ position: "fixed", bottom: 86, right: 18, zIndex: 40 }}>
         <div style={{ position: "relative" }}>
           <button
             onClick={() => setFilterOpen(true)}
@@ -1286,6 +1325,54 @@ export default function App() {
     </>
   );
 
+  const BottomNav = () => {
+    const icon = (active: boolean) => active ? DARK : "rgba(255,255,255,0.72)";
+    const circle = (active: boolean): React.CSSProperties => ({
+      width: 54,
+      height: 54,
+      borderRadius: "50%",
+      border: "none",
+      cursor: "pointer",
+      background: active ? ORANGE : "#2A2A2A",
+      color: icon(active),
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      boxShadow: active ? "0 8px 28px rgba(255,114,55,0.34)" : "none",
+    });
+
+    return (
+      <div style={{ position: "fixed", bottom: 18, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", gap: 10, alignItems: "center", justifyContent: "center", width: "calc(100vw - 32px)", pointerEvents: "none" }}>
+        <div style={{ height: 54, borderRadius: 99, background: "#2A2A2A", padding: 4, display: "flex", gap: 4, pointerEvents: "auto" }}>
+          <button
+            onClick={() => { setViewMode("board"); setStackIndex(0); }}
+            aria-label="Mostra board"
+            style={circle(viewMode === "board")}>
+            <LayoutGrid size={22} color={icon(viewMode === "board")} />
+          </button>
+          <button
+            onClick={() => { setViewMode("stack"); setStackIndex(0); }}
+            aria-label="Mostra card"
+            style={circle(viewMode === "stack")}>
+            <Layers size={22} color={icon(viewMode === "stack")} />
+          </button>
+        </div>
+        <button
+          onClick={() => setViewMode("insights")}
+          aria-label="Mostra insights"
+          style={{ ...circle(viewMode === "insights"), pointerEvents: "auto" }}>
+          <Sparkles size={22} color={icon(viewMode === "insights")} />
+        </button>
+        <button
+          onClick={() => setViewMode("bets")}
+          aria-label="Mostra bets"
+          style={{ ...circle(viewMode === "bets"), pointerEvents: "auto" }}>
+          <Sparkles size={22} color={icon(viewMode === "bets")} />
+        </button>
+      </div>
+    );
+  };
+
   // ── INSIGHTS view ─────────────────────────────────────────────────────────
 
   if (viewMode === "insights") return (
@@ -1347,23 +1434,7 @@ export default function App() {
         )}
       </div>
 
-      <div style={{ position: "fixed", bottom: 20, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", gap: 8 }}>
-        <button
-          onClick={() => { setViewMode("board"); setStackIndex(0); }}
-          style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 20px", borderRadius: 176, height: 52, background: "#2A2A2A", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", fontFamily: FB }}>
-          <LayoutGrid size={20} color="rgba(255,255,255,0.7)" /> Board
-        </button>
-        <button
-          onClick={() => { setViewMode("stack"); setStackIndex(0); }}
-          style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 20px", borderRadius: 176, height: 52, background: "#2A2A2A", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", fontFamily: FB }}>
-          <Layers size={20} color="rgba(255,255,255,0.7)" /> Stack
-        </button>
-        <button
-          onClick={() => setViewMode("bets")}
-          style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 20px", borderRadius: 176, height: 52, background: "#2A2A2A", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", fontFamily: FB }}>
-          <Sparkles size={18} color="rgba(255,255,255,0.7)" /> Bets
-        </button>
-      </div>
+      <BottomNav />
 
       {SharedChrome()}
     </div>
@@ -1462,23 +1533,7 @@ export default function App() {
         </div>
       </div>
 
-      <div style={{ position: "fixed", bottom: 20, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", gap: 8 }}>
-        <button
-          onClick={() => { setViewMode("board"); setStackIndex(0); }}
-          style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 20px", borderRadius: 176, height: 52, background: "#2A2A2A", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", fontFamily: FB }}>
-          <LayoutGrid size={20} color="rgba(255,255,255,0.7)" /> Board
-        </button>
-        <button
-          onClick={() => { setViewMode("stack"); setStackIndex(0); }}
-          style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 20px", borderRadius: 176, height: 52, background: "#2A2A2A", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", fontFamily: FB }}>
-          <Layers size={20} color="rgba(255,255,255,0.7)" /> Stack
-        </button>
-        <button
-          onClick={() => setViewMode("insights")}
-          style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 20px", borderRadius: 176, height: 52, background: "#2A2A2A", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", fontFamily: FB }}>
-          <Sparkles size={18} color="rgba(255,255,255,0.7)" /> Insights
-        </button>
-      </div>
+      <BottomNav />
 
       {SharedChrome()}
     </div>
@@ -1494,23 +1549,7 @@ export default function App() {
           {boardCards.map((card, i) => <CanvasCard key={card.id} card={card} isNew={card.id === "new"} index={i} />)}
         </AnimatePresence>
       </div>
-      <div style={{ position: "fixed", bottom: 20, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", gap: 8 }}>
-        <button
-          onClick={() => { setViewMode("stack"); setStackIndex(0); }}
-          style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 20px", borderRadius: 176, height: 52, background: "#2A2A2A", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", fontFamily: FB }}>
-          <Layers size={20} color="rgba(255,255,255,0.7)" /> Stack
-        </button>
-        <button
-          onClick={() => setViewMode("insights")}
-          style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 20px", borderRadius: 176, height: 52, background: "#2A2A2A", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", fontFamily: FB }}>
-          <Sparkles size={18} color="rgba(255,255,255,0.7)" /> Insights
-        </button>
-        <button
-          onClick={() => setViewMode("bets")}
-          style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 20px", borderRadius: 176, height: 52, background: "#2A2A2A", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", fontFamily: FB }}>
-          <Sparkles size={18} color="rgba(255,255,255,0.7)" /> Bets
-        </button>
-      </div>
+      <BottomNav />
       {SharedChrome()}
     </div>
   );
@@ -1599,23 +1638,7 @@ export default function App() {
       {/* Spacer for fixed bottom buttons */}
       <div style={{ height: 80 }} />
 
-      <div style={{ position: "fixed", bottom: 20, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", gap: 8 }}>
-        <button
-          onClick={() => { setViewMode("board"); setStackIndex(0); }}
-          style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 20px", borderRadius: 176, height: 52, background: "#2A2A2A", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", fontFamily: FB }}>
-          <LayoutGrid size={20} color="rgba(255,255,255,0.7)" /> Board
-        </button>
-        <button
-          onClick={() => setViewMode("insights")}
-          style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 20px", borderRadius: 176, height: 52, background: "#2A2A2A", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", fontFamily: FB }}>
-          <Sparkles size={18} color="rgba(255,255,255,0.7)" /> Insights
-        </button>
-        <button
-          onClick={() => setViewMode("bets")}
-          style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 20px", borderRadius: 176, height: 52, background: "#2A2A2A", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", fontFamily: FB }}>
-          <Sparkles size={18} color="rgba(255,255,255,0.7)" /> Bets
-        </button>
-      </div>
+      <BottomNav />
 
       {SharedChrome()}
     </div>
