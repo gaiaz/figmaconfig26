@@ -885,19 +885,21 @@ export default function App() {
             {/* Step 2 */}
             {step === 2 && (
               <motion.div key="s2" {...slide}>
-                <h2 style={H2}>Il tuo lavoro</h2>
-                <p style={SUB}>Come ti contattano e cosa fai</p>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#D9D9D9", marginBottom: 8, fontFamily: F }}>Email *</label>
+                <h2 style={H2}>Restiamo in contatto</h2>
+                <p style={{ ...SUB, lineHeight: 1.15 }}>
+                  Ti mandiamo il Notion con recap, link utili e tutto quello che nasce dalla serata.
+                </p>
+                <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#D9D9D9", marginBottom: 8, fontFamily: F }}>La tua email *</label>
                 <div style={{ marginBottom: 20 }}>
-                  <FormInput value={email} onChange={setEmail} placeholder="marco@studio.com" type="email" icon={<Mail size={15} />} />
+                  <FormInput value={email} onChange={setEmail} placeholder="nome@studio.com" type="email" icon={<Mail size={15} />} />
                   {email.trim().length > 0 && !isEmailValid && (
                     <p style={{ margin: "8px 0 0", color: "#ff8f70", fontSize: 12, lineHeight: 1.35, fontFamily: F }}>
-                      Inserisci un indirizzo email valido.
+                      Ci serve una mail valida per inviarti il recap.
                     </p>
                   )}
                 </div>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#D9D9D9", marginBottom: 8, fontFamily: F }}>Professione *</label>
-                <FormInput value={profession} onChange={setProfession} placeholder="Product Designer" icon={<Briefcase size={15} />} />
+                <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#D9D9D9", marginBottom: 8, fontFamily: F }}>Di cosa ti occupi? *</label>
+                <FormInput value={profession} onChange={setProfession} placeholder="UI Designer" icon={<Briefcase size={15} />} />
                 <div style={{ marginTop: 32 }}>
                   <PrimaryBtn onClick={() => isEmailValid && profession.trim().length >= 2 && setStep(3)} disabled={!isEmailValid || profession.trim().length < 2}>
                     Continua <ChevronRight size={17} />
