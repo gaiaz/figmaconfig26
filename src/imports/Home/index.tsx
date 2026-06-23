@@ -276,8 +276,11 @@ function Image4031Vectorized() {
 
 function Group() {
   return (
-    <div className="absolute inset-[7.04%_5.4%_84.84%_5.34%]">
-      <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="none" viewBox="0 0 350.789 69.1433">
+    <div
+      className="absolute left-[5.34%] top-[clamp(42px,15.28vw,60px)] w-[89.26%]"
+      style={{ aspectRatio: "350.789 / 69.1433" }}
+    >
+      <svg className="absolute block inset-0 size-full" fill="none" preserveAspectRatio="xMidYMid meet" viewBox="0 0 350.789 69.1433">
         <g id="Group 2147221308">
           <path d={svgPaths.p20b99080} fill="var(--fill-0, #1E1E1E)" id="Subtract" />
           <path d={svgPaths.p6f58700} fill="var(--fill-0, #1E1E1E)" id="Vector" />
