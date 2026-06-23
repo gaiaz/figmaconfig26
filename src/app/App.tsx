@@ -451,7 +451,7 @@ function PortraitCard({ card, scale = 1, editMode = false, placedStickers, conta
               {card.name || "Il tuo nome"}
             </div>
             <div style={{ fontSize: 11 * s, color: "#8b8a97", lineHeight: 1.3 }}>
-              {card.profession || "Professione"}
+              {card.profession || "Cosa fai"}
             </div>
           </div>
 
@@ -813,8 +813,8 @@ export default function App() {
 
         {/* Transparent click overlays matching Frame2 position in Home design. */}
         <div style={{ position: "absolute", top: "min(391px, calc(100dvh - 150px))", left: "50%", transform: "translateX(-50%)", width: "min(360px, calc(100% - 32px))", display: "flex", flexDirection: "column", gap: 16, zIndex: 10 }}>
-          <button onClick={() => setView("form")}   style={{ height: 54.5, opacity: 0, cursor: "pointer", border: "none", width: "100%", background: "transparent" }} aria-label="Crea la tua vCard" />
-          <button onClick={() => setView("canvas")} style={{ height: 54.5, opacity: 0, cursor: "pointer", border: "none", width: "100%", background: "transparent" }} aria-label="Guarda la Board" />
+          <button onClick={() => setView("form")}   style={{ height: 54.5, opacity: 0, cursor: "pointer", border: "none", width: "100%", background: "transparent" }} aria-label="Crea la tua card" />
+          <button onClick={() => setView("canvas")} style={{ height: 54.5, opacity: 0, cursor: "pointer", border: "none", width: "100%", background: "transparent" }} aria-label="Vai alla board" />
         </div>
       </div>
     </div>
@@ -846,8 +846,8 @@ export default function App() {
             {/* Step 1 */}
             {step === 1 && (
               <motion.div key="s1" {...slide}>
-                <h2 style={H2}>La tua identità</h2>
-                <p style={SUB}>Come vuoi presentarti al Config?</p>
+                <h2 style={H2}>Partiamo da te</h2>
+                <p style={SUB}>Scegli come vuoi apparire sulla board.</p>
 
                 <div style={{ display: "flex", justifyContent: "center", marginBottom: 28 }}>
                   <div style={{ position: "relative" }}>
@@ -872,11 +872,11 @@ export default function App() {
                   </div>
                 </div>
 
-                <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#D9D9D9", marginBottom: 8, fontFamily: F }}>Nome completo *</label>
-                <FormInput value={name} onChange={setName} placeholder="Marco Rossi" />
+                <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#D9D9D9", marginBottom: 8, fontFamily: F }}>Nome o nickname *</label>
+                <FormInput value={name} onChange={setName} placeholder="Come ti chiami?" />
                 <div style={{ marginTop: 32 }}>
                   <PrimaryBtn onClick={() => name.trim().length >= 2 && setStep(2)} disabled={name.trim().length < 2}>
-                    Continua <ChevronRight size={17} />
+                    Avanti <ChevronRight size={17} />
                   </PrimaryBtn>
                 </div>
               </motion.div>
@@ -887,22 +887,22 @@ export default function App() {
               <motion.div key="s2" {...slide}>
                 <h2 style={H2}>Restiamo in contatto</h2>
                 <p style={{ ...SUB, lineHeight: 1.15 }}>
-                  Ti mandiamo il Notion con recap, link utili e tutto quello che nasce dalla serata.
+                  Useremo la mail solo per mandarti il Notion con recap, link utili e materiali della serata.
                 </p>
                 <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#D9D9D9", marginBottom: 8, fontFamily: F }}>La tua email *</label>
                 <div style={{ marginBottom: 20 }}>
                   <FormInput value={email} onChange={setEmail} placeholder="nome@studio.com" type="email" icon={<Mail size={15} />} />
                   {email.trim().length > 0 && !isEmailValid && (
                     <p style={{ margin: "8px 0 0", color: "#ff8f70", fontSize: 12, lineHeight: 1.35, fontFamily: F }}>
-                      Ci serve una mail valida per inviarti il recap.
+                      Prova con una mail valida, così riusciamo a mandarti il Notion.
                     </p>
                   )}
                 </div>
-                <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#D9D9D9", marginBottom: 8, fontFamily: F }}>Di cosa ti occupi? *</label>
-                <FormInput value={profession} onChange={setProfession} placeholder="UI Designer" icon={<Briefcase size={15} />} />
+                <label style={{ display: "block", fontSize: 13, fontWeight: 700, color: "#D9D9D9", marginBottom: 8, fontFamily: F }}>Cosa fai o cosa stai esplorando? *</label>
+                <FormInput value={profession} onChange={setProfession} placeholder="UI Designer, studentessa, dev..." icon={<Briefcase size={15} />} />
                 <div style={{ marginTop: 32 }}>
                   <PrimaryBtn onClick={() => isEmailValid && profession.trim().length >= 2 && setStep(3)} disabled={!isEmailValid || profession.trim().length < 2}>
-                    Continua <ChevronRight size={17} />
+                    Avanti <ChevronRight size={17} />
                   </PrimaryBtn>
                 </div>
               </motion.div>
@@ -911,8 +911,8 @@ export default function App() {
             {/* Step 3 */}
             {step === 3 && (
               <motion.div key="s3" {...slide}>
-                <h2 style={H2}>Il tuo Figma DNA</h2>
-                <p style={SUB}>Cosa ti entusiasma di più?</p>
+                <h2 style={H2}>Il tuo mondo Figma</h2>
+                <p style={SUB}>Cosa ti incuriosisce di più?</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 32 }}>
                   {INTEREST_OPTIONS.map((opt, i) => {
                     const sel = interests.includes(opt.id);
@@ -936,7 +936,7 @@ export default function App() {
                   })}
                 </div>
                 <PrimaryBtn onClick={() => interests.length > 0 && setStep(4)} disabled={interests.length === 0}>
-                  Continua <ChevronRight size={17} />
+                  Avanti <ChevronRight size={17} />
                 </PrimaryBtn>
               </motion.div>
             )}
@@ -944,8 +944,8 @@ export default function App() {
             {/* Step 4 */}
             {step === 4 && (
               <motion.div key="s4" {...slide}>
-                <h2 style={H2}>Le tue skill</h2>
-                <p style={SUB}>Gli altri potranno contattarti come reference.</p>
+                <h2 style={H2}>Cose che puoi condividere</h2>
+                <p style={SUB}>Su cosa ti va di fare due chiacchiere?</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 32 }}>
                   {SKILL_OPTIONS.map((sk, i) => {
                     const sel = skills.includes(sk.id);
@@ -969,7 +969,7 @@ export default function App() {
                   })}
                 </div>
                 <PrimaryBtn onClick={() => skills.length > 0 && setStep(5)} disabled={skills.length === 0}>
-                  Continua <ChevronRight size={17} />
+                  Avanti <ChevronRight size={17} />
                 </PrimaryBtn>
               </motion.div>
             )}
@@ -977,8 +977,8 @@ export default function App() {
             {/* Step 5 */}
             {step === 5 && (
               <motion.div key="s5" {...slide} style={{ paddingBottom: 96 }}>
-                <h2 style={H2}>Prossimi eventi</h2>
-                <p style={SUB}>Che temi vorresti vedere dopo?</p>
+                <h2 style={H2}>Prossimi incontri</h2>
+                <p style={SUB}>Che temi ti piacerebbe trovare più avanti?</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 32 }}>
                   {FUTURE_EVENT_OPTIONS.map((topic, i) => {
                     const sel = futureInterests.includes(topic.id);
@@ -1002,7 +1002,7 @@ export default function App() {
                   })}
                 </div>
                 <PrimaryBtn onClick={() => futureInterests.length > 0 && setStep(6)} disabled={futureInterests.length === 0}>
-                  Continua <ChevronRight size={17} />
+                  Avanti <ChevronRight size={17} />
                 </PrimaryBtn>
               </motion.div>
             )}
@@ -1011,7 +1011,7 @@ export default function App() {
             {step === 6 && (
               <motion.div key="s6" {...slide} style={{ paddingBottom: 96 }}>
                 <h2 style={H2}>Figma Future Bets</h2>
-                <p style={SUB}>Secondo te cosa lancerà Figma quest'anno?</p>
+                <p style={SUB}>Su cosa punti per le prossime novità Figma?</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 14 }}>
                   {FUTURE_BET_OPTIONS.map((bet, i) => {
                     const sel = futureBets.includes(bet.id);
@@ -1037,10 +1037,10 @@ export default function App() {
                   })}
                 </div>
                 <p style={{ fontSize: 12, color: "rgba(255,255,255,0.42)", lineHeight: 1.35, margin: "0 0 32px", fontFamily: F }}>
-                  Scegli fino a 5 prediction. Dopo Config potrai segnare quelle uscite davvero e premiare chi ne ha indovinate di più.
+                  Scegli fino a 5 previsioni. Dopo gli annunci vediamo chi ci ha preso di più.
                 </p>
                 <PrimaryBtn onClick={() => futureBets.length > 0 && setStep(7)} disabled={futureBets.length === 0}>
-                  Continua <ChevronRight size={17} />
+                  Avanti <ChevronRight size={17} />
                 </PrimaryBtn>
               </motion.div>
             )}
@@ -1048,7 +1048,7 @@ export default function App() {
             {/* Step 7 — decora la card */}
             {step === 7 && (
               <motion.div key="s7" {...slide} style={{ paddingBottom: 96 }}>
-                <h2 style={H2}>Decora la card</h2>
+                <h2 style={H2}>Falla tua</h2>
 
                 <div style={{ height: 24 }} />
 
@@ -1069,7 +1069,7 @@ export default function App() {
                 </motion.div>
 
                 <p style={{ textAlign: "center", fontSize: 12, color: "rgba(238,226,226,0.7)", marginBottom: 20, fontFamily: F }}>
-                  Cambia colore e aggiungi sticker dalla libreria
+                  Scegli un colore, aggiungi sticker e divertiti un po'.
                 </p>
                 {saveError && (
                   <p style={{ textAlign: "center", fontSize: 12, color: "#ff8f70", lineHeight: 1.35, margin: "-8px 0 16px", fontFamily: F }}>
@@ -1101,7 +1101,7 @@ export default function App() {
         <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, padding: "16px 24px 32px", background: "linear-gradient(to top, #1E1E1E 60%, transparent)", zIndex: 20 }}>
           <button onClick={handleJoin} disabled={isSaving}
             style={{ width: "100%", padding: "16px 0", borderRadius: 4, fontSize: 15, fontWeight: 700, border: "none", cursor: isSaving ? "default" : "pointer", background: ORANGE, color: DARK, opacity: isSaving ? 0.7 : 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, fontFamily: FB }}>
-            <Sparkles size={18} /> {isSaving ? "Salvataggio..." : "Unisciti alla Board"}
+            <Sparkles size={18} /> {isSaving ? "La sto salvando..." : "Entra nella board"}
           </button>
         </div>
       )}
@@ -1232,12 +1232,12 @@ export default function App() {
       {/* Toolbar */}
       <div style={{ position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", alignItems: "center", gap: 10, padding: "8px 12px 8px 16px", borderRadius: 99, background: DARK, whiteSpace: "nowrap" }}>
         <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.6)", fontFamily: F }}>
-          {visibleCards.length}{filterSkills.length > 0 ? `/${cards.length}` : ""} partecipanti
+          {visibleCards.length}{filterSkills.length > 0 ? `/${cards.length}` : ""} persone
         </span>
         <div style={{ padding: "4px 10px", borderRadius: 99, fontSize: 11, fontWeight: 700, background: ORANGE, color: DARK, fontFamily: FB }}>Live</div>
         <button
           onClick={() => setFilterOpen(true)}
-          aria-label="Filtra per expertise"
+          aria-label="Filtra per skill"
           style={{
             position: "relative",
             width: 30,
@@ -1289,10 +1289,10 @@ export default function App() {
               <div style={{ width: 36, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.15)", margin: "0 auto 20px" }} />
 
               <h2 style={{ fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: "-0.5px", marginBottom: 6, fontFamily: F }}>
-                Filtra per expertise
+                Trova persone affini
               </h2>
               <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 20, fontFamily: F }}>
-                Mostra chi sa fare quello che cerchi.
+                Scegli una o più skill e guarda chi può darti una mano o fare due chiacchiere.
               </p>
 
               {/* Skill chips */}
@@ -1318,11 +1318,11 @@ export default function App() {
               <div style={{ display: "flex", gap: 10 }}>
                 <button onClick={() => { setFilterSkills([]); }}
                   style={{ flex: 1, padding: "14px 0", borderRadius: 4, background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.4)", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, fontFamily: FB }}>
-                  Azzera
+                  Togli filtri
                 </button>
                 <button onClick={() => setFilterOpen(false)}
                   style={{ flex: 2, padding: "14px 0", borderRadius: 4, background: ORANGE, color: DARK, border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, fontFamily: FB }}>
-                  Applica{filterSkills.length > 0 ? ` (${filterSkills.length})` : ""}
+                  Mostra{filterSkills.length > 0 ? ` (${filterSkills.length})` : ""}
                 </button>
               </div>
             </motion.div>
@@ -1393,12 +1393,12 @@ export default function App() {
           Cosa vogliono vedere dopo
         </h2>
         <p style={{ fontSize: 16, lineHeight: 1.35, color: "rgba(255,255,255,0.56)", maxWidth: 520, margin: "0 0 30px", fontFamily: F }}>
-          Una lettura rapida degli interessi futuri raccolti dalle vCard. Utile per decidere il prossimo talk, workshop o format.
+          Una lettura veloce dei temi che stanno venendo fuori. Utile per immaginare insieme prossimi talk, workshop o format.
         </p>
 
         {futureStats.length === 0 ? (
           <div style={{ borderRadius: 8, background: "#2A2A2A", padding: 24, color: "rgba(255,255,255,0.55)", fontSize: 14 }}>
-            Nessun interesse futuro raccolto ancora.
+            Ancora nessun tema raccolto. Appena arrivano le card, qui compare il quadro.
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14 }}>
@@ -1413,7 +1413,7 @@ export default function App() {
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 14 }}>
                     <div>
                       <div style={{ fontSize: 17, fontWeight: 800, color: "#fff", fontFamily: FB }}>{topic.label}</div>
-                      <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 4 }}>{topic.count} persone interessate</div>
+                      <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 4 }}>{topic.count} persone curiose</div>
                     </div>
                     <div style={{ minWidth: 46, height: 46, borderRadius: 6, background: topic.color, color: topic.color === "#F9DC1F" ? DARK : "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, fontFamily: FB }}>
                       {pct}%
@@ -1466,7 +1466,7 @@ export default function App() {
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14, marginBottom: 26 }}>
           {betStats.length === 0 ? (
             <div style={{ borderRadius: 8, background: "#2A2A2A", padding: 24, color: "rgba(255,255,255,0.55)", fontSize: 14 }}>
-              Nessuna prediction raccolta ancora.
+              Ancora nessuna previsione. Appena qualcuno punta, la vedrai qui.
             </div>
           ) : betStats.map((bet, i) => {
             const pct = Math.round((bet.count / Math.max(1, cards.length)) * 100);
@@ -1576,7 +1576,7 @@ export default function App() {
         {visibleCards.length === 0 ? (
           <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 16, textAlign: "center" }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
-            Nessuna card corrisponde ai filtri.
+            Non ci sono card con questi filtri. Prova ad allargarli un po'.
           </div>
         ) : (
           <div style={{ position: "relative", width: CW * S_FRONT, height: CH * S_FRONT }}>

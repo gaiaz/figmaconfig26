@@ -302,7 +302,7 @@ function Frame1() {
   return (
     <div className="[word-break:break-word] absolute content-stretch flex flex-col font-['Figma_Sans_Text:Regular',sans-serif] gap-[24px] items-center justify-center left-[29px] not-italic text-[#1e1e1e] top-[209px] whitespace-nowrap">
       <p className="[text-box-edge:cap_alphabetic] [text-box-trim:trim-both] leading-[24.363px] relative shrink-0 text-[55.372px] tracking-[-4.4298px]">Config Board</p>
-      <p className="[text-box-edge:cap_alphabetic] [text-box-trim:trim-both] leading-[1.2] relative shrink-0 text-[24.999px] tracking-[-1.9999px]">Crea la tua vCard con sticker e skill!</p>
+      <p className="[text-box-edge:cap_alphabetic] [text-box-trim:trim-both] leading-[1.2] relative shrink-0 text-[24.999px] tracking-[-1.9999px]">Crea la tua card e incontra persone affini!</p>
     </div>
   );
 }
@@ -310,7 +310,7 @@ function Frame1() {
 function Button() {
   return (
     <div className="bg-[#1e1e1e] content-stretch flex h-[54.5px] items-center justify-center py-[16px] relative rounded-[4px] shrink-0 w-full" data-name="Button">
-      <p className="[word-break:break-word] font-['Plus_Jakarta_Sans:Bold',sans-serif] font-bold leading-[22.5px] relative shrink-0 text-[15px] text-center text-white whitespace-nowrap">{` Crea la tua vCard`}</p>
+      <p className="[word-break:break-word] font-['Plus_Jakarta_Sans:Bold',sans-serif] font-bold leading-[22.5px] relative shrink-0 text-[15px] text-center text-white whitespace-nowrap">{` Crea la tua card`}</p>
     </div>
   );
 }
@@ -318,7 +318,7 @@ function Button() {
 function Button1() {
   return (
     <div className="bg-[#e4e4e4] content-stretch flex h-[54.5px] items-center justify-center py-[16px] relative rounded-[4px] shrink-0 w-full" data-name="Button">
-      <p className="[word-break:break-word] font-['Plus_Jakarta_Sans:Bold',sans-serif] font-bold leading-[22.5px] relative shrink-0 text-[#1e1e1e] text-[15px] text-center whitespace-nowrap">Guarda la Board</p>
+      <p className="[word-break:break-word] font-['Plus_Jakarta_Sans:Bold',sans-serif] font-bold leading-[22.5px] relative shrink-0 text-[#1e1e1e] text-[15px] text-center whitespace-nowrap">Entra nella board</p>
     </div>
   );
 }
