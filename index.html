@@ -4,15 +4,25 @@
     <head>
       
       <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
       <title>Config Board</title>
       <meta name="description" content="Crea una vCard per il watch party Config, decorala con sticker e scopri le skill degli altri partecipanti nella board condivisa." />
       <meta name="theme-color" content="#1E1E1E" />
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       <meta property="og:title" content="Config Board" />
       <meta property="og:description" content="Una board condivisa per creare vCard, sticker e connessioni durante il watch party Config." />
       <meta property="og:type" content="website" />
       <meta name="robots" content="noindex, nofollow" />
-      <style>html, body { height: 100%; margin: 0; } #root { height: 100%; }</style>
+      <style>
+        html, body, #root {
+          min-height: 100%;
+          margin: 0;
+          background: #1E1E1E;
+          color-scheme: dark;
+        }
+        #root { min-height: 100dvh; }
+      </style>
       
     </head>
 

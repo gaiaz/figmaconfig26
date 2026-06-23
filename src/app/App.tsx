@@ -1405,20 +1405,40 @@ export default function App() {
       justifyContent: "center",
       boxShadow: active ? "0 8px 28px rgba(255,114,55,0.34)" : "none",
     });
+    const toggleIcon = (active: boolean): React.CSSProperties => ({
+      width: 52,
+      height: 52,
+      borderRadius: "50%",
+      border: "none",
+      cursor: "pointer",
+      background: "transparent",
+      color: icon(active),
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      position: "relative",
+      zIndex: 2,
+    });
 
     return (
-      <div style={{ position: "fixed", bottom: 18, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", gap: 10, alignItems: "center", justifyContent: "center", width: "calc(100vw - 32px)", pointerEvents: "none" }}>
-        <div style={{ height: 54, borderRadius: 99, background: "#2A2A2A", padding: 4, display: "flex", gap: 4, pointerEvents: "auto" }}>
+      <div style={{ position: "fixed", bottom: "calc(18px + env(safe-area-inset-bottom, 0px))", left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", gap: 10, alignItems: "center", justifyContent: "center", width: "calc(100vw - 32px)", pointerEvents: "none" }}>
+        <div style={{ position: "relative", height: 62, width: 122, borderRadius: 99, background: "#2A2A2A", padding: 5, display: "grid", gridTemplateColumns: "1fr 1fr", pointerEvents: "auto", overflow: "hidden" }}>
+          <motion.div
+            aria-hidden
+            animate={{ x: viewMode === "stack" ? 60 : 0 }}
+            transition={{ type: "spring", stiffness: 520, damping: 34 }}
+            style={{ position: "absolute", top: 5, left: 5, width: 52, height: 52, borderRadius: "50%", background: ORANGE, boxShadow: "0 9px 30px rgba(255,114,55,0.36)" }}
+          />
           <button
             onClick={() => { setViewMode("board"); setStackIndex(0); }}
             aria-label="Mostra board"
-            style={circle(viewMode === "board")}>
+            style={toggleIcon(viewMode === "board")}>
             <LayoutGrid size={22} color={icon(viewMode === "board")} />
           </button>
           <button
             onClick={() => { setViewMode("stack"); setStackIndex(0); }}
             aria-label="Mostra card"
-            style={circle(viewMode === "stack")}>
+            style={toggleIcon(viewMode === "stack")}>
             <Layers size={22} color={icon(viewMode === "stack")} />
           </button>
         </div>

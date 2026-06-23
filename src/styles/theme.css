@@ -126,8 +126,15 @@
 
   body {
     @apply bg-background text-foreground;
+    background: #1E1E1E;
     min-height: 100dvh;
     overscroll-behavior: none;
+  }
+
+  html,
+  #root {
+    background: #1E1E1E;
+    min-height: 100dvh;
   }
 
   button,
