@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Camera, Mail, Briefcase, Sparkles, ChevronRight,
   ArrowLeft, X, Plus,
-  SlidersHorizontal, Layers, LayoutGrid, RotateCcw, RotateCw,
+  SlidersHorizontal, LayoutGrid, RotateCcw, RotateCw, Eye, Trophy,
 } from "lucide-react";
 import HomeScreen from "@/imports/Home/index";
 import {
@@ -1354,7 +1354,7 @@ export default function App() {
             onClick={() => { setViewMode("stack"); setStackIndex(0); }}
             aria-label="Mostra card"
             style={circle(viewMode === "stack")}>
-            <Layers size={22} color={icon(viewMode === "stack")} />
+            <Eye size={22} color={icon(viewMode === "stack")} />
           </button>
         </div>
         <button
@@ -1367,7 +1367,7 @@ export default function App() {
           onClick={() => setViewMode("bets")}
           aria-label="Mostra bets"
           style={{ ...circle(viewMode === "bets"), pointerEvents: "auto" }}>
-          <Sparkles size={22} color={icon(viewMode === "bets")} />
+          <Trophy size={22} color={icon(viewMode === "bets")} />
         </button>
       </div>
     );
