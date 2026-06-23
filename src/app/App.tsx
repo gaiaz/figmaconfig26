@@ -944,8 +944,8 @@ export default function App() {
             {/* Step 4 */}
             {step === 4 && (
               <motion.div key="s4" {...slide}>
-                <h2 style={H2}>Cose che puoi condividere</h2>
-                <p style={SUB}>Su cosa ti va di fare due chiacchiere?</p>
+                <h2 style={H2}>Cosa puoi condividere</h2>
+                <p style={SUB}>Su quali temi puoi condividere la tua conoscenza?</p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 32 }}>
                   {SKILL_OPTIONS.map((sk, i) => {
                     const sel = skills.includes(sk.id);
