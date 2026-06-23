@@ -10,6 +10,7 @@ create table if not exists public.participants (
   interests text[] not null default '{}',
   skills text[] not null default '{}',
   future_interests text[] not null default '{}',
+  future_bets text[] not null default '{}',
   placed_stickers jsonb not null default '[]'::jsonb,
   accent_color text not null default '#7B61FF',
   card_bg text not null default '#7B61FF',
@@ -21,6 +22,9 @@ create table if not exists public.participants (
 
 alter table public.participants
   add column if not exists future_interests text[] not null default '{}';
+
+alter table public.participants
+  add column if not exists future_bets text[] not null default '{}';
 
 create index if not exists participants_event_created_idx
   on public.participants (event_id, created_at desc);

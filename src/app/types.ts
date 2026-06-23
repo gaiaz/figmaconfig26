@@ -16,6 +16,7 @@ export interface VCardData {
   interests: string[];
   skills: string[];
   futureInterests: string[];
+  futureBets: string[];
   placedStickers: PlacedSticker[];
   accentColor: string;
   cardBg: string;

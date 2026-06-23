@@ -23,6 +23,7 @@ export interface ParticipantRow {
   interests: string[];
   skills: string[];
   future_interests: string[];
+  future_bets: string[];
   placed_stickers: PlacedSticker[];
   accent_color: string;
   card_bg: string;
@@ -42,6 +43,7 @@ export function rowToCard(row: ParticipantRow): VCardData {
     interests: row.interests || [],
     skills: row.skills || [],
     futureInterests: row.future_interests || [],
+    futureBets: row.future_bets || [],
     placedStickers: row.placed_stickers || [],
     accentColor: row.accent_color,
     cardBg: row.card_bg,
@@ -62,6 +64,7 @@ export function cardToInsert(card: VCardData, eventId = EVENT_ID): Omit<Particip
     interests: card.interests,
     skills: card.skills,
     future_interests: card.futureInterests,
+    future_bets: card.futureBets,
     placed_stickers: card.placedStickers,
     accent_color: card.accentColor,
     card_bg: card.cardBg,

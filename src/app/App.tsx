@@ -68,6 +68,21 @@ const FUTURE_EVENT_OPTIONS = [
   { id: "dev-handoff", label: "Developer Handoff", color: "#33DFDF" },
 ];
 
+const FUTURE_BET_OPTIONS = [
+  { id: "make-multiscreen-apps", label: "Make genera app multi-schermata", color: "#7B61FF" },
+  { id: "make-github-vercel", label: "Export Make verso GitHub/Vercel", color: ORANGE },
+  { id: "sites-cms", label: "CMS nativo in Figma Sites", color: "#14AE5C" },
+  { id: "sites-analytics", label: "Analytics per Figma Sites", color: "#0D99FF" },
+  { id: "ai-design-review", label: "AI review su accessibilità e spacing", color: "#A259FF" },
+  { id: "devmode-react", label: "Dev Mode genera componenti React", color: "#F24E1E" },
+  { id: "mcp-integrations", label: "MCP più integrato con IDE e agenti", color: "#33DFDF" },
+  { id: "buzz-video", label: "Buzz genera video e campagne complete", color: "#FF7676" },
+  { id: "variables-logic", label: "Variables con formule e logica", color: "#122F76" },
+  { id: "design-system-health", label: "Dashboard health per design system", color: "#24CB71" },
+];
+
+const RESOLVED_BETS: string[] = [];
+
 const BG_PALETTE = [
   "#7B61FF", ORANGE, "#14AE5C", "#0D99FF",
   "#A259FF", "#F24E1E", "#F9DC1F", "#33DFDF",
@@ -472,14 +487,14 @@ function CanvasCard({ card, isNew = false, index = 0 }: { card: VCardData; isNew
 // ─── Existing cards ───────────────────────────────────────────────────────────
 
 const EXISTING_CARDS: VCardData[] = [
-  { id:"c1", name:"Sara Bianchi", photo:null, email:"sara@design.co", profession:"Product Designer", interests:["make","figma"], skills:["ds","autolayout"], futureInterests:["design-systems","ai-product-design"], placedStickers:[{instanceId:"i1",type:"arch",x:22,y:10,rotation:-6,scale:1},{instanceId:"i2",type:"circle-radial",x:140,y:55,rotation:8,scale:0.9}], accentColor:"#7B61FF", cardBg:"#7B61FF", x:60, y:80, rotation:-2.5 },
-  { id:"c2", name:"Marco Ferretti", photo:null, email:"marco@webstudio.io", profession:"Frontend Dev", interests:["sites","make"], skills:["vibecoding","prototyping"], futureInterests:["figma-make","dev-handoff"], placedStickers:[{instanceId:"i3",type:"para",x:100,y:18,rotation:10,scale:1}], accentColor:"#14AE5C", cardBg:"#14AE5C", x:340, y:40, rotation:1.8 },
-  { id:"c3", name:"Giulia Romano", photo:null, email:"giulia@ux.it", profession:"UX Researcher", interests:["buzz","figma"], skills:["interaction","a11y"], futureInterests:["ux-research","accessibility"], placedStickers:[{instanceId:"i4",type:"heart",x:20,y:50,rotation:-5,scale:1},{instanceId:"i5",type:"star",x:125,y:80,rotation:12,scale:0.85}], accentColor:ORANGE, cardBg:ORANGE, x:640, y:100, rotation:-1.2 },
-  { id:"c4", name:"Luca Esposito", photo:null, email:"luca@creative.design", profession:"Creative Director", interests:["figma","make","buzz"], skills:["brand","ds"], futureInterests:["brand-identity","product-strategy"], placedStickers:[{instanceId:"i6",type:"bolt",x:88,y:28,rotation:6,scale:1.1}], accentColor:"#0D99FF", cardBg:"#122F76", x:160, y:340, rotation:2.1 },
-  { id:"c5", name:"Chiara Conti", photo:null, email:"chiara@studio.it", profession:"Brand Designer", interests:["sites","figma"], skills:["brand","variables"], futureInterests:["brand-identity","no-code"], placedStickers:[{instanceId:"i7",type:"eye",x:130,y:20,rotation:-9,scale:1},{instanceId:"i8",type:"blob",x:16,y:60,rotation:6,scale:0.9}], accentColor:"#F24E1E", cardBg:"#F24E1E", x:470, y:300, rotation:-1.8 },
-  { id:"c6", name:"Alessandro Manzoni", photo:null, email:"alex@figmadesign.com", profession:"DS Lead", interests:["make","sites"], skills:["ds","variables","autolayout"], futureInterests:["design-systems","figma-make"], placedStickers:[{instanceId:"i9",type:"diamond",x:38,y:8,rotation:5,scale:1},{instanceId:"i10",type:"speech",x:130,y:65,rotation:-8,scale:0.85}], accentColor:"#A259FF", cardBg:"#33DFDF", x:790, y:360, rotation:1.5 },
-  { id:"c7", name:"Federica Ricci", photo:null, email:"federica@motion.studio", profession:"Motion Designer", interests:["buzz","make"], skills:["prototyping","interaction"], futureInterests:["motion-prototyping","ai-product-design"], placedStickers:[{instanceId:"i11",type:"wave",x:60,y:55,rotation:-10,scale:1}], accentColor:"#1BC47D", cardBg:"#1BC47D", x:940, y:100, rotation:-2 },
-  { id:"c8", name:"Davide Moretti", photo:null, email:"davide@type.it", profession:"Type Designer", interests:["figma","sites"], skills:["brand","a11y"], futureInterests:["accessibility","dev-handoff"], placedStickers:[{instanceId:"i12",type:"cross",x:148,y:14,rotation:-7,scale:1},{instanceId:"i13",type:"moon",x:18,y:52,rotation:10,scale:1}], accentColor:"#0ACF83", cardBg:"#0ACF83", x:1100, y:280, rotation:1.2 },
+  { id:"c1", name:"Sara Bianchi", photo:null, email:"sara@design.co", profession:"Product Designer", interests:["make","figma"], skills:["ds","autolayout"], futureInterests:["design-systems","ai-product-design"], futureBets:["make-multiscreen-apps","ai-design-review","design-system-health"], placedStickers:[{instanceId:"i1",type:"arch",x:22,y:10,rotation:-6,scale:1},{instanceId:"i2",type:"circle-radial",x:140,y:55,rotation:8,scale:0.9}], accentColor:"#7B61FF", cardBg:"#7B61FF", x:60, y:80, rotation:-2.5 },
+  { id:"c2", name:"Marco Ferretti", photo:null, email:"marco@webstudio.io", profession:"Frontend Dev", interests:["sites","make"], skills:["vibecoding","prototyping"], futureInterests:["figma-make","dev-handoff"], futureBets:["make-github-vercel","devmode-react","mcp-integrations"], placedStickers:[{instanceId:"i3",type:"para",x:100,y:18,rotation:10,scale:1}], accentColor:"#14AE5C", cardBg:"#14AE5C", x:340, y:40, rotation:1.8 },
+  { id:"c3", name:"Giulia Romano", photo:null, email:"giulia@ux.it", profession:"UX Researcher", interests:["buzz","figma"], skills:["interaction","a11y"], futureInterests:["ux-research","accessibility"], futureBets:["ai-design-review","sites-analytics","variables-logic"], placedStickers:[{instanceId:"i4",type:"heart",x:20,y:50,rotation:-5,scale:1},{instanceId:"i5",type:"star",x:125,y:80,rotation:12,scale:0.85}], accentColor:ORANGE, cardBg:ORANGE, x:640, y:100, rotation:-1.2 },
+  { id:"c4", name:"Luca Esposito", photo:null, email:"luca@creative.design", profession:"Creative Director", interests:["figma","make","buzz"], skills:["brand","ds"], futureInterests:["brand-identity","product-strategy"], futureBets:["buzz-video","make-multiscreen-apps","design-system-health"], placedStickers:[{instanceId:"i6",type:"bolt",x:88,y:28,rotation:6,scale:1.1}], accentColor:"#0D99FF", cardBg:"#122F76", x:160, y:340, rotation:2.1 },
+  { id:"c5", name:"Chiara Conti", photo:null, email:"chiara@studio.it", profession:"Brand Designer", interests:["sites","figma"], skills:["brand","variables"], futureInterests:["brand-identity","no-code"], futureBets:["sites-cms","buzz-video","variables-logic"], placedStickers:[{instanceId:"i7",type:"eye",x:130,y:20,rotation:-9,scale:1},{instanceId:"i8",type:"blob",x:16,y:60,rotation:6,scale:0.9}], accentColor:"#F24E1E", cardBg:"#F24E1E", x:470, y:300, rotation:-1.8 },
+  { id:"c6", name:"Alessandro Manzoni", photo:null, email:"alex@figmadesign.com", profession:"DS Lead", interests:["make","sites"], skills:["ds","variables","autolayout"], futureInterests:["design-systems","figma-make"], futureBets:["design-system-health","variables-logic","mcp-integrations"], placedStickers:[{instanceId:"i9",type:"diamond",x:38,y:8,rotation:5,scale:1},{instanceId:"i10",type:"speech",x:130,y:65,rotation:-8,scale:0.85}], accentColor:"#A259FF", cardBg:"#33DFDF", x:790, y:360, rotation:1.5 },
+  { id:"c7", name:"Federica Ricci", photo:null, email:"federica@motion.studio", profession:"Motion Designer", interests:["buzz","make"], skills:["prototyping","interaction"], futureInterests:["motion-prototyping","ai-product-design"], futureBets:["buzz-video","make-multiscreen-apps","ai-design-review"], placedStickers:[{instanceId:"i11",type:"wave",x:60,y:55,rotation:-10,scale:1}], accentColor:"#1BC47D", cardBg:"#1BC47D", x:940, y:100, rotation:-2 },
+  { id:"c8", name:"Davide Moretti", photo:null, email:"davide@type.it", profession:"Type Designer", interests:["figma","sites"], skills:["brand","a11y"], futureInterests:["accessibility","dev-handoff"], futureBets:["devmode-react","sites-cms","make-github-vercel"], placedStickers:[{instanceId:"i12",type:"cross",x:148,y:14,rotation:-7,scale:1},{instanceId:"i13",type:"moon",x:18,y:52,rotation:10,scale:1}], accentColor:"#0ACF83", cardBg:"#0ACF83", x:1100, y:280, rotation:1.2 },
 ];
 
 // ─── Shared UI components ─────────────────────────────────────────────────────
@@ -553,7 +568,7 @@ export default function App() {
   const [filterOpen, setFilterOpen]       = useState(false);
   const [decorateModal, setDecorateModal] = useState<"color" | "sticker" | null>(null);
   const [stackDir, setStackDir]           = useState(0); // 1=forward -1=backward
-  const [viewMode, setViewMode]         = useState<"board" | "stack" | "insights">("board");
+  const [viewMode, setViewMode]         = useState<"board" | "stack" | "insights" | "bets">("board");
   const [stackIndex, setStackIndex]     = useState(0);
 
   const [name, setName]             = useState("");
@@ -564,6 +579,7 @@ export default function App() {
   const [interests, setInterests]   = useState<string[]>([]);
   const [skills, setSkills]         = useState<string[]>([]);
   const [futureInterests, setFutureInterests] = useState<string[]>([]);
+  const [futureBets, setFutureBets] = useState<string[]>([]);
   const [placedStickers, setPlacedStickers] = useState<PlacedSticker[]>([]);
   const [cardBg, setCardBg]         = useState(BG_PALETTE[0]);
   const [isSaving, setIsSaving]     = useState(false);
@@ -662,6 +678,7 @@ export default function App() {
         interests,
         skills,
         futureInterests,
+        futureBets,
         placedStickers,
         accentColor: cardBg,
         cardBg,
@@ -685,16 +702,16 @@ export default function App() {
     } finally {
       setIsSaving(false);
     }
-  }, [isSaving, cards.length, uploadPhoto, name, photo, email, profession, interests, skills, futureInterests, placedStickers, cardBg]);
+  }, [isSaving, cards.length, uploadPhoto, name, photo, email, profession, interests, skills, futureInterests, futureBets, placedStickers, cardBg]);
 
   const resetForm = () => {
     setStep(1); setName(""); setPhoto(null); setPhotoFile(null); setEmail(""); setProfession("");
-    setInterests([]); setSkills([]); setFutureInterests([]); setPlacedStickers([]); setCardBg(BG_PALETTE[0]);
+    setInterests([]); setSkills([]); setFutureInterests([]); setFutureBets([]); setPlacedStickers([]); setCardBg(BG_PALETTE[0]);
     if (!isSupabaseConfigured) setCards(EXISTING_CARDS);
     setFilterSkills([]);
   };
 
-  const TOTAL = 6;
+  const TOTAL = 7;
   const slide = { initial: { opacity: 0, x: 28 }, animate: { opacity: 1, x: 0 }, exit: { opacity: 0, x: -28 }, transition: { duration: 0.24, ease: [0.16, 1, 0.3, 1] as number[] } };
 
   // heading style — diff #19 #20 #21 #24 #26 #32
@@ -925,9 +942,47 @@ export default function App() {
               </motion.div>
             )}
 
-            {/* Step 6 — decora la card */}
+            {/* Step 6 */}
             {step === 6 && (
               <motion.div key="s6" {...slide} style={{ paddingBottom: 96 }}>
+                <h2 style={H2}>Figma Future Bets</h2>
+                <p style={SUB}>Secondo te cosa lancerà Figma quest'anno?</p>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 14 }}>
+                  {FUTURE_BET_OPTIONS.map((bet, i) => {
+                    const sel = futureBets.includes(bet.id);
+                    const disabled = !sel && futureBets.length >= 5;
+                    return (
+                      <motion.button key={bet.id}
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: i * 0.04, type: "spring", stiffness: 420, damping: 24 }}
+                        whileTap={{ scale: 0.91 }}
+                        onClick={() => setFutureBets(p => p.includes(bet.id) ? p.filter(x => x !== bet.id) : p.length >= 5 ? p : [...p, bet.id])}
+                        style={{
+                          padding: "9px 18px", borderRadius: 4, cursor: disabled ? "default" : "pointer",
+                          fontSize: 14, fontWeight: 700, fontFamily: FB,
+                          border: sel ? "none" : "1.5px solid rgba(255,255,255,0.14)",
+                          background: sel ? bet.color : "transparent",
+                          color: sel ? "#fff" : disabled ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.55)",
+                          opacity: disabled ? 0.6 : 1,
+                        }}>
+                        {bet.label}
+                      </motion.button>
+                    );
+                  })}
+                </div>
+                <p style={{ fontSize: 12, color: "rgba(255,255,255,0.42)", lineHeight: 1.35, margin: "0 0 32px", fontFamily: F }}>
+                  Scegli fino a 5 prediction. Dopo Config potrai segnare quelle uscite davvero e premiare chi ne ha indovinate di più.
+                </p>
+                <PrimaryBtn onClick={() => futureBets.length > 0 && setStep(7)} disabled={futureBets.length === 0}>
+                  Continua <ChevronRight size={17} />
+                </PrimaryBtn>
+              </motion.div>
+            )}
+
+            {/* Step 7 — decora la card */}
+            {step === 7 && (
+              <motion.div key="s7" {...slide} style={{ paddingBottom: 96 }}>
                 <h2 style={H2}>Decora la card</h2>
 
                 <div style={{ height: 24 }} />
@@ -940,7 +995,7 @@ export default function App() {
                 >
                   <div ref={cardEditorRef} style={{ position: "relative" }}>
                     <PortraitCard
-                      card={{ id: "preview", name, photo, email, profession, interests, skills, futureInterests, placedStickers, accentColor: cardBg, cardBg }}
+                      card={{ id: "preview", name, photo, email, profession, interests, skills, futureInterests, futureBets, placedStickers, accentColor: cardBg, cardBg }}
                       scale={1.3}
                       editMode placedStickers={placedStickers} containerRef={cardEditorRef}
                       onRemove={removeSticker} onMove={moveSticker} onScale={scaleSticker}
@@ -976,8 +1031,8 @@ export default function App() {
         </div>
       </div>
 
-      {/* CTA fissa in fondo — solo allo step 6 */}
-      {step === 6 && (
+      {/* CTA fissa in fondo — solo allo step 7 */}
+      {step === 7 && (
         <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, padding: "16px 24px 32px", background: "linear-gradient(to top, #1E1E1E 60%, transparent)", zIndex: 20 }}>
           <button onClick={handleJoin} disabled={isSaving}
             style={{ width: "100%", padding: "16px 0", borderRadius: 4, fontSize: 15, fontWeight: 700, border: "none", cursor: isSaving ? "default" : "pointer", background: ORANGE, color: DARK, opacity: isSaving ? 0.7 : 1, display: "flex", alignItems: "center", justifyContent: "center", gap: 10, fontFamily: FB }}>
@@ -1081,6 +1136,21 @@ export default function App() {
     })
     .filter(topic => topic.count > 0)
     .sort((a, b) => b.count - a.count);
+
+  const betStats = FUTURE_BET_OPTIONS
+    .map(bet => {
+      const people = cards.filter(card => card.futureBets?.includes(bet.id));
+      return { ...bet, count: people.length, people };
+    })
+    .filter(bet => bet.count > 0)
+    .sort((a, b) => b.count - a.count);
+
+  const betLeaderboard = cards
+    .map(card => ({
+      ...card,
+      score: card.futureBets.filter(id => RESOLVED_BETS.includes(id)).length,
+    }))
+    .sort((a, b) => b.score - a.score);
 
   // Clamp stack index when filter changes
   const safeStackIdx = visibleCards.length > 0 ? stackIndex % visibleCards.length : 0;
@@ -1263,6 +1333,126 @@ export default function App() {
           style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 20px", borderRadius: 176, height: 52, background: "#2A2A2A", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", fontFamily: FB }}>
           <Layers size={20} color="rgba(255,255,255,0.7)" /> Stack
         </button>
+        <button
+          onClick={() => setViewMode("bets")}
+          style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 20px", borderRadius: 176, height: 52, background: "#2A2A2A", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", fontFamily: FB }}>
+          <Sparkles size={18} color="rgba(255,255,255,0.7)" /> Bets
+        </button>
+      </div>
+
+      {SharedChrome()}
+    </div>
+  );
+
+  // ── FUTURE BETS view ─────────────────────────────────────────────────────
+
+  if (viewMode === "bets") return (
+    <div style={{ width: "100vw", minHeight: "100dvh", overflow: "auto", background: DARK, fontFamily: F, color: "#fff", padding: "104px 24px 112px" }}>
+      <div style={{ position: "fixed", inset: 0, backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.055) 1px, transparent 1px)", backgroundSize: "28px 28px", pointerEvents: "none" }} />
+      <div style={{ position: "relative", maxWidth: 960, margin: "0 auto" }}>
+        <p style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: ORANGE, margin: "0 0 12px", fontFamily: FB }}>
+          Figma Future Bets
+        </p>
+        <h2 style={{ fontSize: 44, lineHeight: 0.96, letterSpacing: "-1.32px", fontWeight: 400, color: "#D9D9D9", margin: "0 0 14px", fontFamily: F }}>
+          Le scommesse sulle prossime novità
+        </h2>
+        <p style={{ fontSize: 16, lineHeight: 1.35, color: "rgba(255,255,255,0.56)", maxWidth: 560, margin: "0 0 30px", fontFamily: F }}>
+          Ogni partecipante sceglie le feature che secondo lui Figma lancerà quest'anno. Dopo gli annunci, basta segnare quelle corrette e la classifica diventa il premio finale.
+        </p>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14, marginBottom: 26 }}>
+          {betStats.length === 0 ? (
+            <div style={{ borderRadius: 8, background: "#2A2A2A", padding: 24, color: "rgba(255,255,255,0.55)", fontSize: 14 }}>
+              Nessuna prediction raccolta ancora.
+            </div>
+          ) : betStats.map((bet, i) => {
+            const pct = Math.round((bet.count / Math.max(1, cards.length)) * 100);
+            return (
+              <motion.div key={bet.id}
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.045, type: "spring", stiffness: 300, damping: 28 }}
+                style={{ background: "#2A2A2A", borderRadius: 8, padding: 16, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)" }}>
+                <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 14 }}>
+                  <div>
+                    <div style={{ fontSize: 17, fontWeight: 800, color: "#fff", lineHeight: 1.15, fontFamily: FB }}>{bet.label}</div>
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 5 }}>{bet.count} voti</div>
+                  </div>
+                  <div style={{ minWidth: 46, height: 46, borderRadius: 6, background: bet.color, color: bet.color === "#F9DC1F" ? DARK : "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, fontFamily: FB }}>
+                    {pct}%
+                  </div>
+                </div>
+                <div style={{ height: 8, borderRadius: 99, background: "rgba(255,255,255,0.08)", overflow: "hidden", marginBottom: 14 }}>
+                  <div style={{ width: `${pct}%`, height: "100%", borderRadius: 99, background: bet.color }} />
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  {bet.people.slice(0, 5).map(person => (
+                    <span key={person.id} style={{ fontSize: 11, fontWeight: 700, padding: "5px 8px", borderRadius: 4, color: "rgba(255,255,255,0.76)", background: "rgba(255,255,255,0.07)", fontFamily: FB }}>
+                      {person.name}
+                    </span>
+                  ))}
+                  {bet.people.length > 5 && (
+                    <span style={{ fontSize: 11, fontWeight: 700, padding: "5px 8px", borderRadius: 4, color: "rgba(255,255,255,0.45)", background: "rgba(255,255,255,0.05)", fontFamily: FB }}>
+                      +{bet.people.length - 5}
+                    </span>
+                  )}
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        <div style={{ background: "#2A2A2A", borderRadius: 8, padding: 18, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, marginBottom: 14 }}>
+            <div>
+              <h3 style={{ margin: 0, fontSize: 22, fontWeight: 800, letterSpacing: "-0.66px", color: "#fff", fontFamily: FB }}>Classifica finale</h3>
+              <p style={{ margin: "5px 0 0", fontSize: 13, lineHeight: 1.35, color: "rgba(255,255,255,0.46)" }}>
+                Si attiva quando aggiorni la lista delle prediction indovinate.
+              </p>
+            </div>
+            <div style={{ borderRadius: 99, background: "rgba(255,114,55,0.14)", color: ORANGE, padding: "7px 10px", fontSize: 11, fontWeight: 800, fontFamily: FB }}>
+              {RESOLVED_BETS.length === 0 ? "In attesa" : `${RESOLVED_BETS.length} confermate`}
+            </div>
+          </div>
+
+          {RESOLVED_BETS.length === 0 ? (
+            <div style={{ borderRadius: 6, background: "rgba(255,255,255,0.05)", padding: 14, fontSize: 13, lineHeight: 1.35, color: "rgba(255,255,255,0.56)" }}>
+              Dopo Config inseriamo nel codice le feature annunciate davvero e questa card mostra automaticamente chi ha indovinato di più.
+            </div>
+          ) : (
+            <div style={{ display: "grid", gap: 8 }}>
+              {betLeaderboard.slice(0, 8).map((person, i) => (
+                <div key={person.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, borderRadius: 6, background: "rgba(255,255,255,0.05)", padding: "10px 12px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span style={{ width: 24, height: 24, borderRadius: "50%", background: i === 0 ? ORANGE : "rgba(255,255,255,0.1)", color: i === 0 ? DARK : "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 900, fontFamily: FB }}>
+                      {i + 1}
+                    </span>
+                    <span style={{ fontSize: 14, fontWeight: 800, color: "#fff", fontFamily: FB }}>{person.name}</span>
+                  </div>
+                  <span style={{ fontSize: 13, fontWeight: 800, color: ORANGE, fontFamily: FB }}>{person.score}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div style={{ position: "fixed", bottom: 20, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", gap: 8 }}>
+        <button
+          onClick={() => { setViewMode("board"); setStackIndex(0); }}
+          style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 20px", borderRadius: 176, height: 52, background: "#2A2A2A", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", fontFamily: FB }}>
+          <LayoutGrid size={20} color="rgba(255,255,255,0.7)" /> Board
+        </button>
+        <button
+          onClick={() => { setViewMode("stack"); setStackIndex(0); }}
+          style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 20px", borderRadius: 176, height: 52, background: "#2A2A2A", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", fontFamily: FB }}>
+          <Layers size={20} color="rgba(255,255,255,0.7)" /> Stack
+        </button>
+        <button
+          onClick={() => setViewMode("insights")}
+          style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 20px", borderRadius: 176, height: 52, background: "#2A2A2A", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", fontFamily: FB }}>
+          <Sparkles size={18} color="rgba(255,255,255,0.7)" /> Insights
+        </button>
       </div>
 
       {SharedChrome()}
@@ -1289,6 +1479,11 @@ export default function App() {
           onClick={() => setViewMode("insights")}
           style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 20px", borderRadius: 176, height: 52, background: "#2A2A2A", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", fontFamily: FB }}>
           <Sparkles size={18} color="rgba(255,255,255,0.7)" /> Insights
+        </button>
+        <button
+          onClick={() => setViewMode("bets")}
+          style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 20px", borderRadius: 176, height: 52, background: "#2A2A2A", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", fontFamily: FB }}>
+          <Sparkles size={18} color="rgba(255,255,255,0.7)" /> Bets
         </button>
       </div>
       {SharedChrome()}
@@ -1389,6 +1584,11 @@ export default function App() {
           onClick={() => setViewMode("insights")}
           style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 20px", borderRadius: 176, height: 52, background: "#2A2A2A", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", fontFamily: FB }}>
           <Sparkles size={18} color="rgba(255,255,255,0.7)" /> Insights
+        </button>
+        <button
+          onClick={() => setViewMode("bets")}
+          style={{ display: "flex", alignItems: "center", gap: 10, padding: "13px 20px", borderRadius: 176, height: 52, background: "#2A2A2A", border: "none", cursor: "pointer", fontSize: 14, fontWeight: 700, color: "rgba(255,255,255,0.7)", fontFamily: FB }}>
+          <Sparkles size={18} color="rgba(255,255,255,0.7)" /> Bets
         </button>
       </div>
 
