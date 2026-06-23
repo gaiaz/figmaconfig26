@@ -69,13 +69,18 @@ const FUTURE_EVENT_OPTIONS = [
 ];
 
 const FUTURE_BET_OPTIONS = [
+  { id: "figma-weave-ai-native", label: "Figma Weave per immagini, video e motion", color: "#7B61FF" },
+  { id: "machine-readable-ds", label: "Design system leggibili dagli agenti AI", color: "#14AE5C" },
+  { id: "design-engineer-role", label: "Nasce il ruolo di Design Engineer", color: ORANGE },
+  { id: "protocol-art", label: "Protocol Art: designer che istruiscono agenti AI", color: "#A259FF" },
+  { id: "ai-code-canvas", label: "AI direttamente nel codice e nella tela", color: "#0D99FF" },
   { id: "make-multiscreen-apps", label: "Make genera app multi-schermata", color: "#7B61FF" },
   { id: "make-github-vercel", label: "Export Make verso GitHub/Vercel", color: ORANGE },
   { id: "sites-cms", label: "CMS nativo in Figma Sites", color: "#14AE5C" },
   { id: "sites-analytics", label: "Analytics per Figma Sites", color: "#0D99FF" },
   { id: "ai-design-review", label: "AI review su accessibilità e spacing", color: "#A259FF" },
   { id: "devmode-react", label: "Dev Mode genera componenti React", color: "#F24E1E" },
-  { id: "mcp-integrations", label: "MCP più integrato con IDE e agenti", color: "#33DFDF" },
+  { id: "mcp-integrations", label: "MCP più integrato con IDE e agenti AI", color: "#33DFDF" },
   { id: "buzz-video", label: "Buzz genera video e campagne complete", color: "#FF7676" },
   { id: "variables-logic", label: "Variables con formule e logica", color: "#122F76" },
   { id: "design-system-health", label: "Dashboard health per design system", color: "#24CB71" },
@@ -400,13 +405,14 @@ function EditableSticker({ sticker, onRemove, onMove, onScale, onRotate, cardSca
 
 // ─── Portrait VCard ───────────────────────────────────────────────────────────
 
-function PortraitCard({ card, scale = 1, editMode = false, placedStickers, containerRef, onRemove, onMove, onScale, onRotate }: {
+function PortraitCard({ card, scale = 1, editMode = false, placedStickers, containerRef, onRemove, onMove, onScale, onRotate, onShowAllSkills }: {
   card: Omit<VCardData, "x"|"y"|"rotation">; scale?: number; editMode?: boolean;
   placedStickers?: PlacedSticker[]; containerRef?: React.RefObject<HTMLDivElement | null>;
   onRemove?: (id: string) => void;
   onMove?:   (id: string, x: number, y: number) => void;
   onScale?:  (id: string, factor: number) => void;
   onRotate?: (id: string, degrees: number) => void;
+  onShowAllSkills?: (card: Omit<VCardData, "x"|"y"|"rotation">) => void;
 }) {
   const s = scale;
   const stickers = placedStickers ?? card.placedStickers;
@@ -476,7 +482,22 @@ function PortraitCard({ card, scale = 1, editMode = false, placedStickers, conta
                 const sk = SKILL_OPTIONS.find(x => x.id === id);
                 return sk ? <span key={id} style={{ fontSize: 9 * s, padding: `${2*s}px ${6*s}px`, borderRadius: 4, fontWeight: 700, color: sk.color, background: sk.color + "15", border: `1px solid ${sk.color}40` }}>{sk.label}</span> : null;
               })}
-              {card.skills.length > 3 && <span style={{ fontSize: 8 * s, fontWeight: 700, color: "#B0AFBC" }}>+{card.skills.length - 3}</span>}
+              {card.skills.length > 3 && (
+                <button
+                  onClick={e => { e.stopPropagation(); onShowAllSkills?.(card); }}
+                  style={{
+                    border: "none",
+                    background: "transparent",
+                    padding: 0,
+                    cursor: onShowAllSkills ? "pointer" : "default",
+                    fontSize: 8 * s,
+                    fontWeight: 800,
+                    color: "#B0AFBC",
+                    fontFamily: FB,
+                  }}>
+                  +{card.skills.length - 3}
+                </button>
+              )}
             </div>
           </div>
 
@@ -502,7 +523,7 @@ function PortraitCard({ card, scale = 1, editMode = false, placedStickers, conta
 
 // ─── Canvas card ──────────────────────────────────────────────────────────────
 
-function CanvasCard({ card, isNew = false, index = 0 }: { card: VCardData; isNew?: boolean; index?: number }) {
+function CanvasCard({ card, isNew = false, index = 0, onShowAllSkills }: { card: VCardData; isNew?: boolean; index?: number; onShowAllSkills?: (card: Omit<VCardData, "x"|"y"|"rotation">) => void }) {
   return (
     <motion.div
       initial={isNew
@@ -517,7 +538,7 @@ function CanvasCard({ card, isNew = false, index = 0 }: { card: VCardData; isNew
       }
       style={{ position: "absolute", left: card.x, top: card.y, filter: "drop-shadow(0 6px 20px rgba(0,0,0,0.3))" }}
     >
-      <PortraitCard card={card} scale={0.84} />
+      <PortraitCard card={card} scale={0.84} onShowAllSkills={onShowAllSkills} />
     </motion.div>
   );
 }
@@ -525,14 +546,14 @@ function CanvasCard({ card, isNew = false, index = 0 }: { card: VCardData; isNew
 // ─── Existing cards ───────────────────────────────────────────────────────────
 
 const EXISTING_CARDS: VCardData[] = [
-  { id:"c1", name:"Sara Bianchi", photo:null, email:"sara@design.co", profession:"Product Designer", interests:["make","figma"], skills:["ds","autolayout"], futureInterests:["design-systems","ai-product-design"], futureBets:["make-multiscreen-apps","ai-design-review","design-system-health"], placedStickers:[{instanceId:"i1",type:"arch",x:22,y:10,rotation:-6,scale:1},{instanceId:"i2",type:"circle-radial",x:140,y:55,rotation:8,scale:0.9}], accentColor:"#7B61FF", cardBg:"#7B61FF", x:60, y:80, rotation:-2.5 },
-  { id:"c2", name:"Marco Ferretti", photo:null, email:"marco@webstudio.io", profession:"Frontend Dev", interests:["sites","make"], skills:["vibecoding","prototyping"], futureInterests:["figma-make","dev-handoff"], futureBets:["make-github-vercel","devmode-react","mcp-integrations"], placedStickers:[{instanceId:"i3",type:"para",x:100,y:18,rotation:10,scale:1}], accentColor:"#14AE5C", cardBg:"#14AE5C", x:340, y:40, rotation:1.8 },
-  { id:"c3", name:"Giulia Romano", photo:null, email:"giulia@ux.it", profession:"UX Researcher", interests:["buzz","figma"], skills:["interaction","a11y"], futureInterests:["ux-research","accessibility"], futureBets:["ai-design-review","sites-analytics","variables-logic"], placedStickers:[{instanceId:"i4",type:"heart",x:20,y:50,rotation:-5,scale:1},{instanceId:"i5",type:"star",x:125,y:80,rotation:12,scale:0.85}], accentColor:ORANGE, cardBg:ORANGE, x:640, y:100, rotation:-1.2 },
-  { id:"c4", name:"Luca Esposito", photo:null, email:"luca@creative.design", profession:"Creative Director", interests:["figma","make","buzz"], skills:["brand","ds"], futureInterests:["brand-identity","product-strategy"], futureBets:["buzz-video","make-multiscreen-apps","design-system-health"], placedStickers:[{instanceId:"i6",type:"bolt",x:88,y:28,rotation:6,scale:1.1}], accentColor:"#0D99FF", cardBg:"#122F76", x:160, y:340, rotation:2.1 },
-  { id:"c5", name:"Chiara Conti", photo:null, email:"chiara@studio.it", profession:"Brand Designer", interests:["sites","figma"], skills:["brand","variables"], futureInterests:["brand-identity","no-code"], futureBets:["sites-cms","buzz-video","variables-logic"], placedStickers:[{instanceId:"i7",type:"eye",x:130,y:20,rotation:-9,scale:1},{instanceId:"i8",type:"blob",x:16,y:60,rotation:6,scale:0.9}], accentColor:"#F24E1E", cardBg:"#F24E1E", x:470, y:300, rotation:-1.8 },
-  { id:"c6", name:"Alessandro Manzoni", photo:null, email:"alex@figmadesign.com", profession:"DS Lead", interests:["make","sites"], skills:["ds","variables","autolayout"], futureInterests:["design-systems","figma-make"], futureBets:["design-system-health","variables-logic","mcp-integrations"], placedStickers:[{instanceId:"i9",type:"diamond",x:38,y:8,rotation:5,scale:1},{instanceId:"i10",type:"speech",x:130,y:65,rotation:-8,scale:0.85}], accentColor:"#A259FF", cardBg:"#33DFDF", x:790, y:360, rotation:1.5 },
-  { id:"c7", name:"Federica Ricci", photo:null, email:"federica@motion.studio", profession:"Motion Designer", interests:["buzz","make"], skills:["prototyping","interaction"], futureInterests:["motion-prototyping","ai-product-design"], futureBets:["buzz-video","make-multiscreen-apps","ai-design-review"], placedStickers:[{instanceId:"i11",type:"wave",x:60,y:55,rotation:-10,scale:1}], accentColor:"#1BC47D", cardBg:"#1BC47D", x:940, y:100, rotation:-2 },
-  { id:"c8", name:"Davide Moretti", photo:null, email:"davide@type.it", profession:"Type Designer", interests:["figma","sites"], skills:["brand","a11y"], futureInterests:["accessibility","dev-handoff"], futureBets:["devmode-react","sites-cms","make-github-vercel"], placedStickers:[{instanceId:"i12",type:"cross",x:148,y:14,rotation:-7,scale:1},{instanceId:"i13",type:"moon",x:18,y:52,rotation:10,scale:1}], accentColor:"#0ACF83", cardBg:"#0ACF83", x:1100, y:280, rotation:1.2 },
+  { id:"c1", name:"Sara Bianchi", photo:null, email:"sara@design.co", profession:"Product Designer", interests:["make","figma"], skills:["ds","autolayout"], futureInterests:["design-systems","ai-product-design"], futureBets:["machine-readable-ds","ai-design-review","design-system-health"], placedStickers:[{instanceId:"i1",type:"arch",x:22,y:10,rotation:-6,scale:1},{instanceId:"i2",type:"circle-radial",x:140,y:55,rotation:8,scale:0.9}], accentColor:"#7B61FF", cardBg:"#7B61FF", x:60, y:80, rotation:-2.5 },
+  { id:"c2", name:"Marco Ferretti", photo:null, email:"marco@webstudio.io", profession:"Frontend Dev", interests:["sites","make"], skills:["vibecoding","prototyping"], futureInterests:["figma-make","dev-handoff"], futureBets:["ai-code-canvas","devmode-react","mcp-integrations"], placedStickers:[{instanceId:"i3",type:"para",x:100,y:18,rotation:10,scale:1}], accentColor:"#14AE5C", cardBg:"#14AE5C", x:340, y:40, rotation:1.8 },
+  { id:"c3", name:"Giulia Romano", photo:null, email:"giulia@ux.it", profession:"UX Researcher", interests:["buzz","figma"], skills:["interaction","a11y"], futureInterests:["ux-research","accessibility"], futureBets:["protocol-art","ai-design-review","variables-logic"], placedStickers:[{instanceId:"i4",type:"heart",x:20,y:50,rotation:-5,scale:1},{instanceId:"i5",type:"star",x:125,y:80,rotation:12,scale:0.85}], accentColor:ORANGE, cardBg:ORANGE, x:640, y:100, rotation:-1.2 },
+  { id:"c4", name:"Luca Esposito", photo:null, email:"luca@creative.design", profession:"Creative Director", interests:["figma","make","buzz"], skills:["brand","ds"], futureInterests:["brand-identity","product-strategy"], futureBets:["figma-weave-ai-native","buzz-video","protocol-art"], placedStickers:[{instanceId:"i6",type:"bolt",x:88,y:28,rotation:6,scale:1.1}], accentColor:"#0D99FF", cardBg:"#122F76", x:160, y:340, rotation:2.1 },
+  { id:"c5", name:"Chiara Conti", photo:null, email:"chiara@studio.it", profession:"Brand Designer", interests:["sites","figma"], skills:["brand","variables"], futureInterests:["brand-identity","no-code"], futureBets:["figma-weave-ai-native","buzz-video","variables-logic"], placedStickers:[{instanceId:"i7",type:"eye",x:130,y:20,rotation:-9,scale:1},{instanceId:"i8",type:"blob",x:16,y:60,rotation:6,scale:0.9}], accentColor:"#F24E1E", cardBg:"#F24E1E", x:470, y:300, rotation:-1.8 },
+  { id:"c6", name:"Alessandro Manzoni", photo:null, email:"alex@figmadesign.com", profession:"DS Lead", interests:["make","sites"], skills:["ds","variables","autolayout"], futureInterests:["design-systems","figma-make"], futureBets:["machine-readable-ds","mcp-integrations","design-system-health"], placedStickers:[{instanceId:"i9",type:"diamond",x:38,y:8,rotation:5,scale:1},{instanceId:"i10",type:"speech",x:130,y:65,rotation:-8,scale:0.85}], accentColor:"#A259FF", cardBg:"#33DFDF", x:790, y:360, rotation:1.5 },
+  { id:"c7", name:"Federica Ricci", photo:null, email:"federica@motion.studio", profession:"Motion Designer", interests:["buzz","make"], skills:["prototyping","interaction"], futureInterests:["motion-prototyping","ai-product-design"], futureBets:["figma-weave-ai-native","make-multiscreen-apps","ai-code-canvas"], placedStickers:[{instanceId:"i11",type:"wave",x:60,y:55,rotation:-10,scale:1}], accentColor:"#1BC47D", cardBg:"#1BC47D", x:940, y:100, rotation:-2 },
+  { id:"c8", name:"Davide Moretti", photo:null, email:"davide@type.it", profession:"Type Designer", interests:["figma","sites"], skills:["brand","a11y"], futureInterests:["accessibility","dev-handoff"], futureBets:["design-engineer-role","machine-readable-ds","mcp-integrations"], placedStickers:[{instanceId:"i12",type:"cross",x:148,y:14,rotation:-7,scale:1},{instanceId:"i13",type:"moon",x:18,y:52,rotation:10,scale:1}], accentColor:"#0ACF83", cardBg:"#0ACF83", x:1100, y:280, rotation:1.2 },
 ];
 
 const BOARD_LAYOUT = [
@@ -629,6 +650,7 @@ export default function App() {
   const [cards, setCards]         = useState<VCardData[]>(EXISTING_CARDS);
   const [filterSkills, setFilterSkills] = useState<string[]>([]);
   const [filterOpen, setFilterOpen]       = useState(false);
+  const [skillsCard, setSkillsCard]       = useState<Omit<VCardData, "x"|"y"|"rotation"> | null>(null);
   const [decorateModal, setDecorateModal] = useState<"color" | "sticker" | null>(null);
   const [stackDir, setStackDir]           = useState(0); // 1=forward -1=backward
   const [viewMode, setViewMode]         = useState<"board" | "stack" | "insights" | "bets">("board");
@@ -1329,6 +1351,54 @@ export default function App() {
           </>
         )}
       </AnimatePresence>
+
+      {/* Skill detail sheet */}
+      <AnimatePresence>
+        {skillsCard && (
+          <>
+            <motion.div
+              key="skills-backdrop"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setSkillsCard(null)}
+              style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.58)", zIndex: 54 }}
+            />
+            <motion.div
+              key="skills-sheet"
+              initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+              transition={{ type: "spring", stiffness: 320, damping: 30 }}
+              style={{ position: "fixed", left: 0, right: 0, bottom: 0, background: "#242424", borderRadius: "20px 20px 0 0", padding: "12px 20px 40px", zIndex: 55 }}
+            >
+              <div style={{ width: 36, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.15)", margin: "0 auto 20px" }} />
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 6 }}>
+                <div>
+                  <h2 style={{ margin: 0, fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: "-0.6px", fontFamily: F }}>
+                    Cosa condivide {skillsCard.name}
+                  </h2>
+                  <p style={{ margin: "8px 0 0", fontSize: 13, lineHeight: 1.35, color: "rgba(255,255,255,0.45)", fontFamily: F }}>
+                    Tutti i temi su cui puoi chiedere dritte, esempi o una chiacchiera.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setSkillsCard(null)}
+                  aria-label="Chiudi"
+                  style={{ width: 34, height: 34, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.65)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+                  <X size={16} />
+                </button>
+              </div>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 20 }}>
+                {skillsCard.skills.map(id => {
+                  const sk = SKILL_OPTIONS.find(x => x.id === id);
+                  return sk ? (
+                    <span key={id} style={{ fontSize: 13, padding: "9px 12px", borderRadius: 6, fontWeight: 800, color: sk.color, background: sk.color + "16", border: `1px solid ${sk.color}45`, fontFamily: FB }}>
+                      {sk.label}
+                    </span>
+                  ) : null;
+                })}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </>
   );
 
@@ -1553,7 +1623,7 @@ export default function App() {
       <div style={{ position: "fixed", inset: 0, backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.065) 1px, transparent 1px)", backgroundSize: "28px 28px", pointerEvents: "none" }} />
       <div style={{ position: "relative", width: 1500, height: 900, minWidth: "100vw", minHeight: "100dvh" }}>
         <AnimatePresence>
-          {boardCards.map((card, i) => <CanvasCard key={card.id} card={card} isNew={card.id === "new"} index={i} />)}
+          {boardCards.map((card, i) => <CanvasCard key={card.id} card={card} isNew={card.id === "new"} index={i} onShowAllSkills={setSkillsCard} />)}
         </AnimatePresence>
       </div>
       <BottomNav />
@@ -1625,7 +1695,7 @@ export default function App() {
                     else if (info.offset.x > 70) goPrev();
                   }}
                 >
-                  <PortraitCard card={stackCard} scale={S_FRONT} />
+                  <PortraitCard card={stackCard} scale={S_FRONT} onShowAllSkills={setSkillsCard} />
                 </motion.div>
               )}
             </AnimatePresence>
