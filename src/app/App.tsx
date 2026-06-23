@@ -1457,13 +1457,13 @@ export default function App() {
       <div style={{ position: "fixed", inset: 0, backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.055) 1px, transparent 1px)", backgroundSize: "28px 28px", pointerEvents: "none" }} />
       <div style={{ position: "relative", maxWidth: 920, margin: "0 auto" }}>
         <p style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: ORANGE, margin: "0 0 12px", fontFamily: FB }}>
-          Event intelligence
+          Prossimi incontri
         </p>
         <h2 style={{ fontSize: 44, lineHeight: 0.96, letterSpacing: "-1.32px", fontWeight: 400, color: "#D9D9D9", margin: "0 0 14px", fontFamily: F }}>
-          Cosa vogliono vedere dopo
+          Cosa vi va di fare insieme dopo
         </h2>
         <p style={{ fontSize: 16, lineHeight: 1.35, color: "rgba(255,255,255,0.56)", maxWidth: 520, margin: "0 0 30px", fontFamily: F }}>
-          Una lettura veloce dei temi che stanno venendo fuori. Utile per immaginare insieme prossimi talk, workshop o format.
+          Qui raccogliamo i temi che vi incuriosiscono, così i prossimi incontri nascono da quello che avete davvero voglia di esplorare.
         </p>
 
         {futureStats.length === 0 ? (
