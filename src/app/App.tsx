@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Camera, Mail, Briefcase, Sparkles, ChevronRight,
   ArrowLeft, X, Plus,
-  SlidersHorizontal, LayoutGrid, RotateCcw, RotateCw, Eye, Trophy,
+  SlidersHorizontal, Layers, LayoutGrid, RotateCcw, RotateCw, Trophy,
 } from "lucide-react";
 import HomeScreen from "@/imports/Home/index";
 import {
@@ -1235,6 +1235,29 @@ export default function App() {
           {visibleCards.length}{filterSkills.length > 0 ? `/${cards.length}` : ""} partecipanti
         </span>
         <div style={{ padding: "4px 10px", borderRadius: 99, fontSize: 11, fontWeight: 700, background: ORANGE, color: DARK, fontFamily: FB }}>Live</div>
+        <button
+          onClick={() => setFilterOpen(true)}
+          aria-label="Filtra per expertise"
+          style={{
+            position: "relative",
+            width: 30,
+            height: 30,
+            borderRadius: "50%",
+            background: filterSkills.length > 0 ? ORANGE : "rgba(255,255,255,0.08)",
+            border: "none",
+            cursor: "pointer",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: filterSkills.length > 0 ? DARK : "rgba(255,255,255,0.68)",
+          }}>
+          <SlidersHorizontal size={15} color={filterSkills.length > 0 ? DARK : "rgba(255,255,255,0.68)"} />
+          {filterSkills.length > 0 && (
+            <span style={{ position: "absolute", top: -3, right: -3, width: 14, height: 14, borderRadius: "50%", background: "#fff", color: DARK, fontSize: 9, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FB, lineHeight: 1 }}>
+              {filterSkills.length}
+            </span>
+          )}
+        </button>
       </div>
 
       {/* Home button */}
@@ -1242,22 +1265,6 @@ export default function App() {
         style={{ position: "fixed", top: 20, left: 20, zIndex: 40, display: "flex", alignItems: "center", gap: 8, padding: "10px 16px", borderRadius: 99, fontSize: 12, fontWeight: 700, border: "none", background: DARK, cursor: "pointer", color: "rgba(255,255,255,0.5)", fontFamily: F }}>
         <ArrowLeft size={13} />
       </button>
-
-      {/* Filter FAB — lifted above bottom navigation on mobile */}
-      <div style={{ position: "fixed", bottom: 86, right: 18, zIndex: 40 }}>
-        <div style={{ position: "relative" }}>
-          <button
-            onClick={() => setFilterOpen(true)}
-            style={{ width: 52, height: 52, borderRadius: "50%", background: ORANGE, border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 6px 24px rgba(255,114,55,0.45)" }}>
-            <SlidersHorizontal size={20} color={DARK} />
-          </button>
-          {filterSkills.length > 0 && (
-            <div style={{ position: "absolute", top: 0, right: 0, width: 17, height: 17, borderRadius: "50%", background: "#fff", color: DARK, fontSize: 11, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FB, lineHeight: 1 }}>
-              {filterSkills.length}
-            </div>
-          )}
-        </div>
-      </div>
 
       {/* Filter modal */}
       <AnimatePresence>
@@ -1354,7 +1361,7 @@ export default function App() {
             onClick={() => { setViewMode("stack"); setStackIndex(0); }}
             aria-label="Mostra card"
             style={circle(viewMode === "stack")}>
-            <Eye size={22} color={icon(viewMode === "stack")} />
+            <Layers size={22} color={icon(viewMode === "stack")} />
           </button>
         </div>
         <button
