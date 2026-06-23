@@ -497,6 +497,31 @@ const EXISTING_CARDS: VCardData[] = [
   { id:"c8", name:"Davide Moretti", photo:null, email:"davide@type.it", profession:"Type Designer", interests:["figma","sites"], skills:["brand","a11y"], futureInterests:["accessibility","dev-handoff"], futureBets:["devmode-react","sites-cms","make-github-vercel"], placedStickers:[{instanceId:"i12",type:"cross",x:148,y:14,rotation:-7,scale:1},{instanceId:"i13",type:"moon",x:18,y:52,rotation:10,scale:1}], accentColor:"#0ACF83", cardBg:"#0ACF83", x:1100, y:280, rotation:1.2 },
 ];
 
+const BOARD_LAYOUT = [
+  { x: 90,   y: 120, rotation: -2.5 },
+  { x: 405,  y: 72,  rotation: 1.8 },
+  { x: 715,  y: 150, rotation: -1.2 },
+  { x: 1040, y: 84,  rotation: 2.4 },
+  { x: 190,  y: 455, rotation: 1.6 },
+  { x: 520,  y: 390, rotation: -2.1 },
+  { x: 835,  y: 480, rotation: 1.3 },
+  { x: 1160, y: 360, rotation: -1.7 },
+  { x: 60,   y: 690, rotation: 2.1 },
+  { x: 390,  y: 650, rotation: -1.5 },
+  { x: 730,  y: 720, rotation: 2.5 },
+  { x: 1085, y: 670, rotation: -2.3 },
+];
+
+function boardPose(index: number) {
+  const base = BOARD_LAYOUT[index % BOARD_LAYOUT.length];
+  const cycle = Math.floor(index / BOARD_LAYOUT.length);
+  return {
+    x: base.x + cycle * 34,
+    y: base.y + cycle * 26,
+    rotation: base.rotation + ((cycle % 3) - 1) * 0.6,
+  };
+}
+
 // ─── Shared UI components ─────────────────────────────────────────────────────
 
 // Step dots — active dot is orange (#FF7237) per diff
@@ -667,7 +692,8 @@ export default function App() {
 
     try {
       const id = crypto.randomUUID();
-      const nextIndex = Math.max(0, cards.length - EXISTING_CARDS.length);
+      const nextIndex = cards.length;
+      const pose = boardPose(nextIndex);
       const photoUrl = await uploadPhoto(id);
       const nextCard: VCardData = {
         id,
@@ -682,9 +708,7 @@ export default function App() {
         placedStickers,
         accentColor: cardBg,
         cardBg,
-        x: 360 + (nextIndex % 3) * 90,
-        y: 520 + Math.floor(nextIndex / 3) * 60,
-        rotation: -1.5 + (nextIndex % 5) * 0.8,
+        ...pose,
       };
 
       if (supabase) {
@@ -720,8 +744,8 @@ export default function App() {
     fontWeight: 400,           // diff #24 — weight removed
     color: "#D9D9D9",          // diff #4
     letterSpacing: "-1.44px",  // -3% of 48px
-    lineHeight: "24.36px",     // diff #20
-    marginBottom: 4,
+    lineHeight: "45px",
+    marginBottom: 14,
     fontFamily: F,             // diff #26 — Figma Sans Text
     textBoxTrim: "trim-both",  // diff #32
     textBoxEdge: "cap alphabetic",
@@ -1128,6 +1152,7 @@ export default function App() {
   const visibleCards = filterSkills.length === 0
     ? cards
     : cards.filter(c => filterSkills.some(sk => c.skills.includes(sk)));
+  const boardCards = visibleCards.map((card, i) => ({ ...card, ...boardPose(i) }));
 
   const futureStats = FUTURE_EVENT_OPTIONS
     .map(topic => {
@@ -1466,7 +1491,7 @@ export default function App() {
       <div style={{ position: "fixed", inset: 0, backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.065) 1px, transparent 1px)", backgroundSize: "28px 28px", pointerEvents: "none" }} />
       <div style={{ position: "relative", width: 1500, height: 900, minWidth: "100vw", minHeight: "100dvh" }}>
         <AnimatePresence>
-          {visibleCards.map((card, i) => <CanvasCard key={card.id} card={card} isNew={card.id === "new"} index={i} />)}
+          {boardCards.map((card, i) => <CanvasCard key={card.id} card={card} isNew={card.id === "new"} index={i} />)}
         </AnimatePresence>
       </div>
       <div style={{ position: "fixed", bottom: 20, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", gap: 8 }}>
