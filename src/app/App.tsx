@@ -1468,10 +1468,10 @@ export default function App() {
           Prossimi incontri
         </p>
         <h2 style={{ fontSize: 44, lineHeight: 0.96, letterSpacing: "-1.32px", fontWeight: 400, color: "#D9D9D9", margin: "0 0 14px", fontFamily: F }}>
-          Cosa vi va di fare insieme dopo
+          Argomenti che vi interessano per i prossimi incontri
         </h2>
         <p style={{ fontSize: 16, lineHeight: 1.35, color: "rgba(255,255,255,0.56)", maxWidth: 520, margin: "0 0 30px", fontFamily: F }}>
-          Qui raccogliamo i temi che vi incuriosiscono, così i prossimi incontri nascono da quello che avete davvero voglia di esplorare.
+          Qui vedi cosa incuriosisce il gruppo, così i prossimi talk e workshop nascono da interessi reali.
         </p>
 
         {futureStats.length === 0 ? (
