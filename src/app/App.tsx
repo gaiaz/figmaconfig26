@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Camera, Mail, Briefcase, Sparkles, ChevronRight,
   ArrowLeft, X, Plus,
-  SlidersHorizontal, Layers, LayoutGrid, RotateCcw, RotateCw, Trophy,
+  SlidersHorizontal, Layers, LayoutGrid, RotateCcw, RotateCw, Trophy, BookOpen,
 } from "lucide-react";
 import HomeScreen from "@/imports/Home/index";
 import {
@@ -82,6 +82,41 @@ const FUTURE_BET_OPTIONS = [
   { id: "devmode-clean-code", label: "Dev Mode genera codice più pronto all'uso", description: "Handoff più vicino alla produzione, con componenti e specifiche leggibili dagli sviluppatori.", color: "#F9DC1F" },
   { id: "figma-weave-ai-native", label: "Figma Weave per immagini, video e motion", description: "Dopo l'acquisizione di Weavy, Figma porta immagini, video, animazioni e VFX dentro la canvas.", color: "#7B61FF" },
   { id: "machine-readable-ds", label: "Design system leggibili dagli agenti AI", description: "Token e componenti strutturati perché gli agenti li capiscano e li usino senza fare errori.", color: "#14AE5C" },
+];
+
+const RESOURCE_LINKS = [
+  {
+    id: "glossary",
+    title: "Glossario Config",
+    description: "Parole, feature e concetti nuovi spiegati senza fuffa, da tenere aperto mentre si commenta.",
+    label: "Apri glossario",
+    href: "#",
+    color: "#7B61FF",
+  },
+  {
+    id: "timeline",
+    title: "Timeline delle novità",
+    description: "La sequenza degli annunci: cosa è uscito, quando, e perché conta per designer e team.",
+    label: "Apri timeline",
+    href: "#",
+    color: ORANGE,
+  },
+  {
+    id: "recap",
+    title: "Recap del keynote",
+    description: "Un riassunto leggibile da mandare al team o riprendere il giorno dopo senza riguardare tutto.",
+    label: "Apri recap",
+    href: "#",
+    color: "#14AE5C",
+  },
+  {
+    id: "references",
+    title: "Link utili e materiali",
+    description: "Video, talk, documentazione, thread e riferimenti raccolti in un posto solo.",
+    label: "Apri link utili",
+    href: "#",
+    color: "#33DFDF",
+  },
 ];
 
 const RESOLVED_BETS: string[] = [];
@@ -657,7 +692,7 @@ export default function App() {
   const [betDetailCard, setBetDetailCard] = useState<VCardData | null>(null);
   const [decorateModal, setDecorateModal] = useState<"color" | "sticker" | null>(null);
   const [stackDir, setStackDir]           = useState(0); // 1=forward -1=backward
-  const [viewMode, setViewMode]         = useState<"board" | "stack" | "insights" | "bets">("board");
+  const [viewMode, setViewMode]         = useState<"board" | "stack" | "insights" | "bets" | "resources">("board");
   const [stackIndex, setStackIndex]     = useState(0);
 
   const [name, setName]             = useState("");
@@ -1644,7 +1679,7 @@ export default function App() {
     });
 
     return (
-      <div style={{ position: "fixed", bottom: "calc(18px + env(safe-area-inset-bottom, 0px))", left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", gap: 10, alignItems: "center", justifyContent: "center", width: "calc(100vw - 32px)", pointerEvents: "none" }}>
+      <div style={{ position: "fixed", bottom: "calc(18px + env(safe-area-inset-bottom, 0px))", left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", gap: 8, alignItems: "center", justifyContent: "center", width: "calc(100vw - 20px)", pointerEvents: "none" }}>
         <div style={{ position: "relative", height: 62, width: 122, borderRadius: 99, background: "#2A2A2A", padding: 5, display: "grid", gridTemplateColumns: "1fr 1fr", pointerEvents: "auto", overflow: "hidden" }}>
           <motion.div
             aria-hidden
@@ -1676,6 +1711,12 @@ export default function App() {
           aria-label="Mostra bets"
           style={{ ...circle(viewMode === "bets"), pointerEvents: "auto" }}>
           <Trophy size={22} color={icon(viewMode === "bets")} />
+        </button>
+        <button
+          onClick={() => setViewMode("resources")}
+          aria-label="Mostra risorse"
+          style={{ ...circle(viewMode === "resources"), pointerEvents: "auto" }}>
+          <BookOpen size={22} color={icon(viewMode === "resources")} />
         </button>
       </div>
     );
@@ -1740,6 +1781,66 @@ export default function App() {
             })}
           </div>
         )}
+      </div>
+
+      <BottomNav />
+
+      {SharedChrome()}
+    </div>
+  );
+
+  // ── RESOURCES view ───────────────────────────────────────────────────────
+
+  if (viewMode === "resources") return (
+    <div style={{ width: "100vw", minHeight: "100dvh", overflow: "auto", background: DARK, fontFamily: F, color: "#fff", padding: "104px 24px 112px" }}>
+      <div style={{ position: "fixed", inset: 0, backgroundImage: "radial-gradient(circle, rgba(255,255,255,0.055) 1px, transparent 1px)", backgroundSize: "28px 28px", pointerEvents: "none" }} />
+      <div style={{ position: "relative", maxWidth: 960, margin: "0 auto" }}>
+        <p style={{ fontSize: 12, fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", color: ORANGE, margin: "0 0 12px", fontFamily: FB }}>
+          Risorse
+        </p>
+        <h2 style={{ fontSize: 44, lineHeight: 0.96, letterSpacing: "-1.32px", fontWeight: 400, color: "#D9D9D9", margin: "0 0 14px", fontFamily: F }}>
+          Tutto quello che ci portiamo a casa
+        </h2>
+        <p style={{ fontSize: 16, lineHeight: 1.35, color: "rgba(255,255,255,0.56)", maxWidth: 560, margin: "0 0 30px", fontFamily: F }}>
+          Qui puoi raccogliere i Notion del post-evento: glossario, timeline degli annunci, recap e materiali utili.
+        </p>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 14 }}>
+          {RESOURCE_LINKS.map((resource, i) => {
+            const hasLink = resource.href !== "#";
+            return (
+              <motion.article
+                key={resource.id}
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.045, type: "spring", stiffness: 300, damping: 28 }}
+                style={{ minHeight: 210, borderRadius: 8, background: "#2A2A2A", padding: 18, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.05)", display: "flex", flexDirection: "column", justifyContent: "space-between", gap: 20 }}>
+                <div>
+                  <div style={{ width: 38, height: 38, borderRadius: 8, background: `${resource.color}24`, color: resource.color, display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+                    <BookOpen size={19} />
+                  </div>
+                  <h3 style={{ margin: "0 0 9px", fontSize: 21, lineHeight: 1, fontWeight: 900, letterSpacing: "-0.63px", color: "#fff", fontFamily: FB }}>
+                    {resource.title}
+                  </h3>
+                  <p style={{ margin: 0, fontSize: 13, lineHeight: 1.38, color: "rgba(255,255,255,0.48)", fontFamily: F }}>
+                    {resource.description}
+                  </p>
+                </div>
+                <a
+                  href={resource.href}
+                  target={hasLink ? "_blank" : undefined}
+                  rel={hasLink ? "noreferrer" : undefined}
+                  onClick={(event) => {
+                    if (!hasLink) event.preventDefault();
+                  }}
+                  style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8, minHeight: 42, borderRadius: 6, background: hasLink ? resource.color : "rgba(255,255,255,0.08)", color: hasLink && resource.color !== "#F9DC1F" ? "#fff" : "rgba(255,255,255,0.42)", textDecoration: "none", fontSize: 13, fontWeight: 900, fontFamily: FB, cursor: hasLink ? "pointer" : "default" }}>
+                  {hasLink ? resource.label : "Link Notion da aggiungere"}
+                  {hasLink && <ChevronRight size={15} />}
+                </a>
+              </motion.article>
+            );
+          })}
+        </div>
       </div>
 
       <BottomNav />
