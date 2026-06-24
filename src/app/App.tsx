@@ -654,6 +654,7 @@ export default function App() {
   const [filterSkills, setFilterSkills] = useState<string[]>([]);
   const [filterOpen, setFilterOpen]       = useState(false);
   const [skillsCard, setSkillsCard]       = useState<Omit<VCardData, "x"|"y"|"rotation"> | null>(null);
+  const [betDetailCard, setBetDetailCard] = useState<VCardData | null>(null);
   const [decorateModal, setDecorateModal] = useState<"color" | "sticker" | null>(null);
   const [stackDir, setStackDir]           = useState(0); // 1=forward -1=backward
   const [viewMode, setViewMode]         = useState<"board" | "stack" | "insights" | "bets">("board");
@@ -1416,6 +1417,39 @@ export default function App() {
       score: card.futureBets.filter(id => resolvedBets.includes(id)).length,
     }))
     .sort((a, b) => b.score - a.score);
+  const betDetailCorrect = betDetailCard
+    ? betDetailCard.futureBets.filter(id => resolvedBets.includes(id))
+    : [];
+  const betDetailWrong = betDetailCard
+    ? betDetailCard.futureBets.filter(id => !resolvedBets.includes(id))
+    : [];
+  const betDetailMissed = betDetailCard
+    ? resolvedBets.filter(id => !betDetailCard.futureBets.includes(id))
+    : [];
+  const getBetOption = (id: string) => FUTURE_BET_OPTIONS.find(bet => bet.id === id);
+  const renderBetRows = (ids: string[], empty: string) => ids.length > 0 ? (
+    <div style={{ display: "grid", gap: 8 }}>
+      {ids.map(id => {
+        const bet = getBetOption(id);
+        if (!bet) return null;
+        return (
+          <div key={id} style={{ borderRadius: 8, background: "rgba(255,255,255,0.06)", border: `1px solid ${bet.color}30`, padding: 12 }}>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 9 }}>
+              <span style={{ width: 9, height: 9, borderRadius: "50%", background: bet.color, flexShrink: 0, marginTop: 4 }} />
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 900, lineHeight: 1.14, color: "#fff", fontFamily: FB }}>{bet.label}</div>
+                <div style={{ marginTop: 5, fontSize: 11, lineHeight: 1.35, color: "rgba(255,255,255,0.44)", fontFamily: F }}>{bet.description}</div>
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  ) : (
+    <div style={{ borderRadius: 8, background: "rgba(255,255,255,0.05)", padding: 12, fontSize: 12, lineHeight: 1.35, color: "rgba(255,255,255,0.44)", fontFamily: F }}>
+      {empty}
+    </div>
+  );
 
   // Clamp stack index when filter changes
   const safeStackIdx = visibleCards.length > 0 ? stackIndex % visibleCards.length : 0;
@@ -1793,20 +1827,87 @@ export default function App() {
           ) : (
             <div style={{ display: "grid", gap: 8 }}>
               {betLeaderboard.slice(0, 8).map((person, i) => (
-                <div key={person.id} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, borderRadius: 6, background: "rgba(255,255,255,0.05)", padding: "10px 12px" }}>
+                <button
+                  key={person.id}
+                  onClick={() => setBetDetailCard(person)}
+                  style={{ width: "100%", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, borderRadius: 6, border: "none", background: "rgba(255,255,255,0.05)", padding: "10px 12px", cursor: "pointer", textAlign: "left" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                     <span style={{ width: 24, height: 24, borderRadius: "50%", background: i === 0 ? ORANGE : "rgba(255,255,255,0.1)", color: i === 0 ? DARK : "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 900, fontFamily: FB }}>
                       {i + 1}
                     </span>
                     <span style={{ fontSize: 14, fontWeight: 800, color: "#fff", fontFamily: FB }}>{person.name}</span>
                   </div>
-                  <span style={{ fontSize: 13, fontWeight: 800, color: ORANGE, fontFamily: FB }}>{person.score}</span>
-                </div>
+                  <span style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 800, color: ORANGE, fontFamily: FB }}>
+                    {person.score}
+                    <ChevronRight size={14} />
+                  </span>
+                </button>
               ))}
             </div>
           )}
         </div>
       </div>
+
+      <AnimatePresence>
+        {betDetailCard && (
+          <>
+            <motion.div
+              key="bet-detail-backdrop"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => setBetDetailCard(null)}
+              style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.62)", zIndex: 54 }}
+            />
+            <motion.div
+              key="bet-detail-sheet"
+              initial={{ y: "100%" }} animate={{ y: 0 }} exit={{ y: "100%" }}
+              transition={{ type: "spring", stiffness: 320, damping: 30 }}
+              style={{ position: "fixed", left: 0, right: 0, bottom: 0, maxHeight: "82vh", overflowY: "auto", background: "#242424", borderRadius: "20px 20px 0 0", padding: "12px 20px calc(34px + env(safe-area-inset-bottom, 0px))", zIndex: 55 }}
+            >
+              <div style={{ width: 36, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.15)", margin: "0 auto 20px" }} />
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 14, marginBottom: 18 }}>
+                <div>
+                  <p style={{ margin: "0 0 8px", color: ORANGE, fontSize: 11, fontWeight: 900, letterSpacing: "0.08em", textTransform: "uppercase", fontFamily: FB }}>
+                    Dettaglio prediction
+                  </p>
+                  <h3 style={{ margin: 0, fontSize: 24, lineHeight: 1, fontWeight: 900, color: "#fff", letterSpacing: "-0.72px", fontFamily: FB }}>
+                    {betDetailCard.name}
+                  </h3>
+                  <p style={{ margin: "8px 0 0", color: "rgba(255,255,255,0.48)", fontSize: 13, lineHeight: 1.35 }}>
+                    {betDetailCorrect.length} azzeccate su {resolvedBets.length} feature confermate.
+                  </p>
+                </div>
+                <button
+                  onClick={() => setBetDetailCard(null)}
+                  aria-label="Chiudi"
+                  style={{ width: 34, height: 34, borderRadius: "50%", border: "none", background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.65)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", flexShrink: 0 }}>
+                  <X size={16} />
+                </button>
+              </div>
+
+              <div style={{ display: "grid", gap: 18 }}>
+                <section>
+                  <h4 style={{ margin: "0 0 9px", fontSize: 13, fontWeight: 900, color: "#14AE5C", fontFamily: FB }}>
+                    Azzeccate
+                  </h4>
+                  {renderBetRows(betDetailCorrect, "Nessuna prediction azzeccata per ora. Si rifà al prossimo Config.")}
+                </section>
+                <section>
+                  <h4 style={{ margin: "0 0 9px", fontSize: 13, fontWeight: 900, color: ORANGE, fontFamily: FB }}>
+                    Puntate, ma non confermate
+                  </h4>
+                  {renderBetRows(betDetailWrong, "Nessuna prediction sbagliata: profilo chirurgico.")}
+                </section>
+                <section>
+                  <h4 style={{ margin: "0 0 9px", fontSize: 13, fontWeight: 900, color: "rgba(255,255,255,0.56)", fontFamily: FB }}>
+                    Uscite, ma non scelte
+                  </h4>
+                  {renderBetRows(betDetailMissed, "Non ha mancato nessuna feature confermata.")}
+                </section>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       <BottomNav />
 
