@@ -69,19 +69,17 @@ const FUTURE_EVENT_OPTIONS = [
 ];
 
 const FUTURE_BET_OPTIONS = [
-  { id: "figma-weave-ai-native", label: "Figma Weave per immagini, video e motion integrato", color: "#7B61FF" },
-  { id: "machine-readable-ds", label: "Design system leggibili dagli agenti AI", color: "#14AE5C" },
-  { id: "mcp-integrations", label: "MCP più integrato con IDE e agenti AI", color: "#33DFDF" },
-  { id: "weave-video-motion", label: "Weave genera video, animazioni e micro-motion", color: "#A259FF" },
-  { id: "ai-code-canvas", label: "AI direttamente nel codice e nella canvas", color: "#0D99FF" },
-  { id: "agent-readable-tokens", label: "Token e componenti capiti dagli agenti senza spiegoni", color: "#14AE5C" },
-  { id: "mcp-ide-bridge", label: "MCP collega Figma a VS Code, Cursor e altri IDE", color: "#33DFDF" },
-  { id: "make-multiscreen-apps", label: "Make genera app multi-schermata", color: "#7B61FF" },
-  { id: "make-github-vercel", label: "Export Make verso GitHub/Vercel", color: ORANGE },
-  { id: "sites-cms", label: "CMS nativo in Figma Sites", color: "#14AE5C" },
-  { id: "ai-design-review", label: "AI review su accessibilità e spacing", color: "#A259FF" },
-  { id: "devmode-react", label: "Dev Mode genera componenti React", color: "#F24E1E" },
-  { id: "buzz-video", label: "Buzz genera video e campagne complete", color: "#FF7676" },
+  { id: "figma-agents", label: "AI integrata e nuovi Figma Agents", description: "L'AI smette di essere solo prompt-to-design e diventa un assistente di sistema dentro file, componenti e handoff.", color: "#7B61FF" },
+  { id: "smart-variant-adaptation", label: "Smart Variant Adaptation", description: "Crei un componente desktop e Figma genera varianti responsive per mobile, tablet e altri canali.", color: "#0D99FF" },
+  { id: "agent-accessibility-review", label: "Agenti per accessibilità e design tokens", description: "Agenti che controllano contrasto, leggibilità e coerenza con i token aziendali prima dell'handoff.", color: "#A259FF" },
+  { id: "advanced-prototyping", label: "Prototipazione avanzata stile Framer", description: "Figma prova a chiudere il gap con strumenti più fluidi per prototipi realistici e interattivi.", color: ORANGE },
+  { id: "scroll-animations", label: "Scroll-based animations native", description: "Animazioni e transizioni che reagiscono direttamente allo scrolling della pagina.", color: "#F24E1E" },
+  { id: "relative-variables-logic", label: "Variabili relative e logica avanzata", description: "Percentuali, REM, fr e trigger logici quando una variabile cambia durante il prototipo.", color: "#14AE5C" },
+  { id: "design-dev-pipeline", label: "Pipeline unica tra design e sviluppo", description: "Figma diventa meno tela statica e più sistema di produzione per definire regole e output.", color: "#33DFDF" },
+  { id: "mcp-ide-agents", label: "MCP più integrato con IDE e agenti AI", description: "Connessioni più forti con VS Code, Cursor e ambienti agentici per trasformare regole in codice.", color: "#33DFDF" },
+  { id: "devmode-clean-code", label: "Dev Mode genera codice più pronto all'uso", description: "Handoff più vicino alla produzione, con componenti e specifiche leggibili dagli sviluppatori.", color: "#F9DC1F" },
+  { id: "figma-weave-ai-native", label: "Figma Weave per immagini, video e motion", description: "Dopo l'acquisizione di Weavy, Figma porta immagini, video, animazioni e VFX dentro la canvas.", color: "#7B61FF" },
+  { id: "machine-readable-ds", label: "Design system leggibili dagli agenti AI", description: "Token e componenti strutturati perché gli agenti li capiscano e li usino senza fare errori.", color: "#14AE5C" },
 ];
 
 const RESOLVED_BETS: string[] = [];
@@ -544,14 +542,14 @@ function CanvasCard({ card, isNew = false, index = 0, onShowAllSkills }: { card:
 // ─── Existing cards ───────────────────────────────────────────────────────────
 
 const EXISTING_CARDS: VCardData[] = [
-  { id:"c1", name:"Sara Bianchi", photo:null, email:"sara@design.co", profession:"Product Designer", interests:["make","figma"], skills:["ds","autolayout"], futureInterests:["design-systems","ai-product-design"], futureBets:["machine-readable-ds","mcp-integrations"], placedStickers:[{instanceId:"i1",type:"arch",x:22,y:10,rotation:-6,scale:1},{instanceId:"i2",type:"circle-radial",x:140,y:55,rotation:8,scale:0.9}], accentColor:"#7B61FF", cardBg:"#7B61FF", x:60, y:80, rotation:-2.5 },
-  { id:"c2", name:"Marco Ferretti", photo:null, email:"marco@webstudio.io", profession:"Frontend Dev", interests:["sites","make"], skills:["vibecoding","prototyping"], futureInterests:["figma-make","dev-handoff"], futureBets:["mcp-integrations","figma-weave-ai-native"], placedStickers:[{instanceId:"i3",type:"para",x:100,y:18,rotation:10,scale:1}], accentColor:"#14AE5C", cardBg:"#14AE5C", x:340, y:40, rotation:1.8 },
-  { id:"c3", name:"Giulia Romano", photo:null, email:"giulia@ux.it", profession:"UX Researcher", interests:["buzz","figma"], skills:["interaction","a11y"], futureInterests:["ux-research","accessibility"], futureBets:["machine-readable-ds","figma-weave-ai-native"], placedStickers:[{instanceId:"i4",type:"heart",x:20,y:50,rotation:-5,scale:1},{instanceId:"i5",type:"star",x:125,y:80,rotation:12,scale:0.85}], accentColor:ORANGE, cardBg:ORANGE, x:640, y:100, rotation:-1.2 },
-  { id:"c4", name:"Luca Esposito", photo:null, email:"luca@creative.design", profession:"Creative Director", interests:["figma","make","buzz"], skills:["brand","ds"], futureInterests:["brand-identity","product-strategy"], futureBets:["figma-weave-ai-native","mcp-integrations"], placedStickers:[{instanceId:"i6",type:"bolt",x:88,y:28,rotation:6,scale:1.1}], accentColor:"#0D99FF", cardBg:"#122F76", x:160, y:340, rotation:2.1 },
-  { id:"c5", name:"Chiara Conti", photo:null, email:"chiara@studio.it", profession:"Brand Designer", interests:["sites","figma"], skills:["brand","variables"], futureInterests:["brand-identity","no-code"], futureBets:["figma-weave-ai-native","machine-readable-ds"], placedStickers:[{instanceId:"i7",type:"eye",x:130,y:20,rotation:-9,scale:1},{instanceId:"i8",type:"blob",x:16,y:60,rotation:6,scale:0.9}], accentColor:"#F24E1E", cardBg:"#F24E1E", x:470, y:300, rotation:-1.8 },
-  { id:"c6", name:"Alessandro Manzoni", photo:null, email:"alex@figmadesign.com", profession:"DS Lead", interests:["make","sites"], skills:["ds","variables","autolayout"], futureInterests:["design-systems","figma-make"], futureBets:["machine-readable-ds","mcp-integrations"], placedStickers:[{instanceId:"i9",type:"diamond",x:38,y:8,rotation:5,scale:1},{instanceId:"i10",type:"speech",x:130,y:65,rotation:-8,scale:0.85}], accentColor:"#A259FF", cardBg:"#33DFDF", x:790, y:360, rotation:1.5 },
-  { id:"c7", name:"Federica Ricci", photo:null, email:"federica@motion.studio", profession:"Motion Designer", interests:["buzz","make"], skills:["prototyping","interaction"], futureInterests:["motion-prototyping","ai-product-design"], futureBets:["figma-weave-ai-native","mcp-integrations"], placedStickers:[{instanceId:"i11",type:"wave",x:60,y:55,rotation:-10,scale:1}], accentColor:"#1BC47D", cardBg:"#1BC47D", x:940, y:100, rotation:-2 },
-  { id:"c8", name:"Davide Moretti", photo:null, email:"davide@type.it", profession:"Type Designer", interests:["figma","sites"], skills:["brand","a11y"], futureInterests:["accessibility","dev-handoff"], futureBets:["machine-readable-ds","mcp-integrations"], placedStickers:[{instanceId:"i12",type:"cross",x:148,y:14,rotation:-7,scale:1},{instanceId:"i13",type:"moon",x:18,y:52,rotation:10,scale:1}], accentColor:"#0ACF83", cardBg:"#0ACF83", x:1100, y:280, rotation:1.2 },
+  { id:"c1", name:"Sara Bianchi", photo:null, email:"sara@design.co", profession:"Product Designer", interests:["make","figma"], skills:["ds","autolayout"], futureInterests:["design-systems","ai-product-design"], futureBets:["machine-readable-ds","agent-accessibility-review","smart-variant-adaptation"], placedStickers:[{instanceId:"i1",type:"arch",x:22,y:10,rotation:-6,scale:1},{instanceId:"i2",type:"circle-radial",x:140,y:55,rotation:8,scale:0.9}], accentColor:"#7B61FF", cardBg:"#7B61FF", x:60, y:80, rotation:-2.5 },
+  { id:"c2", name:"Marco Ferretti", photo:null, email:"marco@webstudio.io", profession:"Frontend Dev", interests:["sites","make"], skills:["vibecoding","prototyping"], futureInterests:["figma-make","dev-handoff"], futureBets:["mcp-ide-agents","design-dev-pipeline","devmode-clean-code"], placedStickers:[{instanceId:"i3",type:"para",x:100,y:18,rotation:10,scale:1}], accentColor:"#14AE5C", cardBg:"#14AE5C", x:340, y:40, rotation:1.8 },
+  { id:"c3", name:"Giulia Romano", photo:null, email:"giulia@ux.it", profession:"UX Researcher", interests:["buzz","figma"], skills:["interaction","a11y"], futureInterests:["ux-research","accessibility"], futureBets:["figma-agents","agent-accessibility-review","relative-variables-logic"], placedStickers:[{instanceId:"i4",type:"heart",x:20,y:50,rotation:-5,scale:1},{instanceId:"i5",type:"star",x:125,y:80,rotation:12,scale:0.85}], accentColor:ORANGE, cardBg:ORANGE, x:640, y:100, rotation:-1.2 },
+  { id:"c4", name:"Luca Esposito", photo:null, email:"luca@creative.design", profession:"Creative Director", interests:["figma","make","buzz"], skills:["brand","ds"], futureInterests:["brand-identity","product-strategy"], futureBets:["figma-weave-ai-native","advanced-prototyping","scroll-animations"], placedStickers:[{instanceId:"i6",type:"bolt",x:88,y:28,rotation:6,scale:1.1}], accentColor:"#0D99FF", cardBg:"#122F76", x:160, y:340, rotation:2.1 },
+  { id:"c5", name:"Chiara Conti", photo:null, email:"chiara@studio.it", profession:"Brand Designer", interests:["sites","figma"], skills:["brand","variables"], futureInterests:["brand-identity","no-code"], futureBets:["figma-weave-ai-native","machine-readable-ds","figma-agents"], placedStickers:[{instanceId:"i7",type:"eye",x:130,y:20,rotation:-9,scale:1},{instanceId:"i8",type:"blob",x:16,y:60,rotation:6,scale:0.9}], accentColor:"#F24E1E", cardBg:"#F24E1E", x:470, y:300, rotation:-1.8 },
+  { id:"c6", name:"Alessandro Manzoni", photo:null, email:"alex@figmadesign.com", profession:"DS Lead", interests:["make","sites"], skills:["ds","variables","autolayout"], futureInterests:["design-systems","figma-make"], futureBets:["machine-readable-ds","mcp-ide-agents","agent-accessibility-review"], placedStickers:[{instanceId:"i9",type:"diamond",x:38,y:8,rotation:5,scale:1},{instanceId:"i10",type:"speech",x:130,y:65,rotation:-8,scale:0.85}], accentColor:"#A259FF", cardBg:"#33DFDF", x:790, y:360, rotation:1.5 },
+  { id:"c7", name:"Federica Ricci", photo:null, email:"federica@motion.studio", profession:"Motion Designer", interests:["buzz","make"], skills:["prototyping","interaction"], futureInterests:["motion-prototyping","ai-product-design"], futureBets:["figma-weave-ai-native","scroll-animations","advanced-prototyping"], placedStickers:[{instanceId:"i11",type:"wave",x:60,y:55,rotation:-10,scale:1}], accentColor:"#1BC47D", cardBg:"#1BC47D", x:940, y:100, rotation:-2 },
+  { id:"c8", name:"Davide Moretti", photo:null, email:"davide@type.it", profession:"Type Designer", interests:["figma","sites"], skills:["brand","a11y"], futureInterests:["accessibility","dev-handoff"], futureBets:["relative-variables-logic","design-dev-pipeline","devmode-clean-code"], placedStickers:[{instanceId:"i12",type:"cross",x:148,y:14,rotation:-7,scale:1},{instanceId:"i13",type:"moon",x:18,y:52,rotation:10,scale:1}], accentColor:"#0ACF83", cardBg:"#0ACF83", x:1100, y:280, rotation:1.2 },
 ];
 
 const BOARD_LAYOUT = [
@@ -1031,8 +1029,8 @@ export default function App() {
             {step === 6 && (
               <motion.div key="s6" {...slide} style={{ paddingBottom: 96 }}>
                 <h2 style={H2}>Figma Future Bets</h2>
-                <p style={SUB}>Su cosa punti per le prossime novità Figma?</p>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 14 }}>
+                <p style={SUB}>Scegli le prediction che ti sembrano più probabili. Ogni opzione ha un po' di contesto per orientarsi.</p>
+                <div style={{ display: "grid", gap: 10, marginBottom: 14 }}>
                   {FUTURE_BET_OPTIONS.map((bet, i) => {
                     const sel = futureBets.includes(bet.id);
                     const disabled = !sel && futureBets.length >= 5;
@@ -1044,14 +1042,25 @@ export default function App() {
                         whileTap={{ scale: 0.91 }}
                         onClick={() => setFutureBets(p => p.includes(bet.id) ? p.filter(x => x !== bet.id) : p.length >= 5 ? p : [...p, bet.id])}
                         style={{
-                          padding: "9px 18px", borderRadius: 4, cursor: disabled ? "default" : "pointer",
-                          fontSize: 14, fontWeight: 700, fontFamily: FB,
-                          border: sel ? "none" : "1.5px solid rgba(255,255,255,0.14)",
-                          background: sel ? bet.color : "transparent",
-                          color: sel ? "#fff" : disabled ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.55)",
+                          padding: "13px 14px", borderRadius: 8, cursor: disabled ? "default" : "pointer",
+                          border: sel ? `1.5px solid ${bet.color}` : "1.5px solid rgba(255,255,255,0.12)",
+                          background: sel ? `${bet.color}24` : "rgba(255,255,255,0.03)",
+                          color: disabled ? "rgba(255,255,255,0.24)" : "#fff",
                           opacity: disabled ? 0.6 : 1,
+                          textAlign: "left",
+                          boxShadow: sel ? `0 0 0 1px ${bet.color}33, inset 0 1px 0 rgba(255,255,255,0.08)` : "inset 0 1px 0 rgba(255,255,255,0.04)",
                         }}>
-                        {bet.label}
+                        <span style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                          <span style={{ width: 10, height: 10, borderRadius: "50%", background: sel ? bet.color : "rgba(255,255,255,0.16)", flexShrink: 0, marginTop: 4 }} />
+                          <span>
+                            <span style={{ display: "block", fontSize: 14, fontWeight: 800, lineHeight: 1.12, fontFamily: FB, color: sel ? "#fff" : "rgba(255,255,255,0.72)" }}>
+                              {bet.label}
+                            </span>
+                            <span style={{ display: "block", marginTop: 6, fontSize: 12, lineHeight: 1.35, fontFamily: F, color: sel ? "rgba(255,255,255,0.72)" : "rgba(255,255,255,0.42)" }}>
+                              {bet.description}
+                            </span>
+                          </span>
+                        </span>
                       </motion.button>
                     );
                   })}
@@ -1567,7 +1576,8 @@ export default function App() {
                 <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 14 }}>
                   <div>
                     <div style={{ fontSize: 17, fontWeight: 800, color: "#fff", lineHeight: 1.15, fontFamily: FB }}>{bet.label}</div>
-                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 5 }}>{bet.count} voti</div>
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 6, lineHeight: 1.35 }}>{bet.description}</div>
+                    <div style={{ fontSize: 12, color: "rgba(255,255,255,0.45)", marginTop: 8 }}>{bet.count} voti</div>
                   </div>
                   <div style={{ minWidth: 46, height: 46, borderRadius: 6, background: bet.color, color: bet.color === "#F9DC1F" ? DARK : "#fff", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, fontWeight: 900, fontFamily: FB }}>
                     {pct}%
