@@ -41,7 +41,7 @@ const INTEREST_OPTIONS = [
   { id: "make",  label: "Figma Make",  color: "#7B61FF", bg: "#f0ecff" },
   { id: "buzz",  label: "Figma Buzz",  color: ORANGE,    bg: "#fff3ee" },
   { id: "sites", label: "Figma Sites", color: "#14AE5C", bg: "#e8f9f0" },
-  { id: "figma", label: "Solo Figma",  color: "#0D99FF", bg: "#e5f4ff" },
+  { id: "figma", label: "Figma",       color: "#0D99FF", bg: "#e5f4ff" },
 ];
 
 const SKILL_OPTIONS = [
@@ -72,6 +72,16 @@ const FUTURE_BET_OPTIONS = [
   { id: "figma-weave-ai-native", label: "Figma Weave per immagini, video e motion integrato", color: "#7B61FF" },
   { id: "machine-readable-ds", label: "Design system leggibili dagli agenti AI", color: "#14AE5C" },
   { id: "mcp-integrations", label: "MCP più integrato con IDE e agenti AI", color: "#33DFDF" },
+  { id: "weave-video-motion", label: "Weave genera video, animazioni e micro-motion", color: "#A259FF" },
+  { id: "ai-code-canvas", label: "AI direttamente nel codice e nella canvas", color: "#0D99FF" },
+  { id: "agent-readable-tokens", label: "Token e componenti capiti dagli agenti senza spiegoni", color: "#14AE5C" },
+  { id: "mcp-ide-bridge", label: "MCP collega Figma a VS Code, Cursor e altri IDE", color: "#33DFDF" },
+  { id: "make-multiscreen-apps", label: "Make genera app multi-schermata", color: "#7B61FF" },
+  { id: "make-github-vercel", label: "Export Make verso GitHub/Vercel", color: ORANGE },
+  { id: "sites-cms", label: "CMS nativo in Figma Sites", color: "#14AE5C" },
+  { id: "ai-design-review", label: "AI review su accessibilità e spacing", color: "#A259FF" },
+  { id: "devmode-react", label: "Dev Mode genera componenti React", color: "#F24E1E" },
+  { id: "buzz-video", label: "Buzz genera video e campagne complete", color: "#FF7676" },
 ];
 
 const RESOLVED_BETS: string[] = [];
