@@ -3,13 +3,12 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Camera, Mail, Briefcase, Sparkles, ChevronRight,
   ArrowLeft, X, Plus,
-  SlidersHorizontal, Layers, LayoutGrid, Trophy, BookOpen,
+  SlidersHorizontal, Layers, LayoutGrid, Trophy, BookOpen, MapPin,
 } from "lucide-react";
 import HomeScreen from "@/imports/Home/index";
 import {
   EVENT_ID,
   PHOTO_BUCKET,
-  RESULTS_EVENT_ID,
   cardToInsert,
   isSupabaseConfigured,
   rowToCard,
@@ -109,6 +108,12 @@ const RESOURCE_LINKS = [
     href: "https://app.notion.com/p/gaiaz/Config-2026-Watch-Party-Hub-38835028e5d081beb4a2f1cb0d9537ba",
     color: "#14AE5C",
   },
+];
+
+const LOCATION_OPTIONS = [
+  { id: "milano", label: "Milano", accent: "#7B61FF" },
+  { id: "cosenza", label: "Cosenza", accent: ORANGE },
+  { id: "roma", label: "Roma", accent: "#14AE5C" },
 ];
 
 const RESOLVED_BETS: string[] = [];
@@ -674,10 +679,14 @@ function PrimaryBtn({ onClick, disabled, children }: { onClick?: () => void; dis
 
 // ─── App ──────────────────────────────────────────────────────────────────────
 
-type View = "welcome" | "form" | "canvas" | "admin";
+type View = "location" | "welcome" | "form" | "canvas" | "admin";
 
 export default function App() {
-  const [view, setView]           = useState<View>(() => window.location.pathname === "/admin" ? "admin" : "welcome");
+  const [view, setView]           = useState<View>(() => window.location.pathname === "/admin" ? "admin" : "location");
+  const [selectedLocation, setSelectedLocation] = useState(() => {
+    const stored = window.localStorage.getItem("config-watch-party-location");
+    return LOCATION_OPTIONS.some(location => location.id === stored) ? stored! : LOCATION_OPTIONS[0].id;
+  });
   const [step, setStep]           = useState(1);
   const [cards, setCards]         = useState<VCardData[]>(EXISTING_CARDS);
   const [resolvedBets, setResolvedBets] = useState<string[]>(RESOLVED_BETS);
@@ -711,6 +720,18 @@ export default function App() {
 
   const fileRef      = useRef<HTMLInputElement>(null);
   const cardEditorRef = useRef<HTMLDivElement>(null);
+  const activeLocation = LOCATION_OPTIONS.find(location => location.id === selectedLocation) || LOCATION_OPTIONS[0];
+  const activeEventId = `${EVENT_ID}:${activeLocation.id}`;
+  const activeResultsEventId = `${activeEventId}:future-bet-results`;
+
+  const chooseLocation = (locationId: string, nextView: View = "welcome") => {
+    setSelectedLocation(locationId);
+    window.localStorage.setItem("config-watch-party-location", locationId);
+    setViewMode("board");
+    setStackIndex(0);
+    setFilterSkills([]);
+    setView(nextView);
+  };
 
   const handlePhoto = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0]; if (!f) return;
@@ -719,15 +740,21 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!supabase) return;
+    if (!supabase) {
+      setCards(EXISTING_CARDS);
+      setResolvedBets(RESOLVED_BETS);
+      return;
+    }
 
     let cancelled = false;
+    setCards([]);
+    setResolvedBets([]);
 
     const loadParticipants = async () => {
       const { data, error } = await supabase
         .from("participants")
         .select("*")
-        .eq("event_id", EVENT_ID)
+        .eq("event_id", activeEventId)
         .order("created_at", { ascending: true });
 
       if (cancelled) return;
@@ -743,7 +770,7 @@ export default function App() {
       const { data, error } = await supabase
         .from("participants")
         .select("future_bets")
-        .eq("event_id", RESULTS_EVENT_ID)
+        .eq("event_id", activeResultsEventId)
         .order("created_at", { ascending: false })
         .limit(1);
 
@@ -756,10 +783,10 @@ export default function App() {
     void loadResults();
 
     const participantChannel = supabase
-      .channel(`participants:${EVENT_ID}`)
+      .channel(`participants:${activeEventId}`)
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "participants", filter: `event_id=eq.${EVENT_ID}` },
+        { event: "INSERT", schema: "public", table: "participants", filter: `event_id=eq.${activeEventId}` },
         payload => {
           const card = rowToCard(payload.new as ParticipantRow);
           setCards(prev => prev.some(existing => existing.id === card.id) ? prev : [...prev, card]);
@@ -768,10 +795,10 @@ export default function App() {
       .subscribe();
 
     const resultsChannel = supabase
-      .channel(`future-bet-results:${EVENT_ID}`)
+      .channel(`future-bet-results:${activeEventId}`)
       .on(
         "postgres_changes",
-        { event: "INSERT", schema: "public", table: "participants", filter: `event_id=eq.${RESULTS_EVENT_ID}` },
+        { event: "INSERT", schema: "public", table: "participants", filter: `event_id=eq.${activeResultsEventId}` },
         payload => {
           const row = payload.new as ParticipantRow;
           setResolvedBets(row.future_bets || []);
@@ -784,7 +811,7 @@ export default function App() {
       void supabase.removeChannel(participantChannel);
       void supabase.removeChannel(resultsChannel);
     };
-  }, []);
+  }, [activeEventId, activeResultsEventId]);
 
   const addSticker = (type: string) => {
     const st = STICKER_MAP[type]; if (!st) return;
@@ -807,7 +834,7 @@ export default function App() {
     if (!supabase || !photoFile) return photo;
 
     const ext = photoFile.name.split(".").pop()?.toLowerCase() || "jpg";
-    const path = `${EVENT_ID}/${participantId}.${ext}`;
+    const path = `${activeEventId}/${participantId}.${ext}`;
     const { error } = await supabase.storage
       .from(PHOTO_BUCKET)
       .upload(path, photoFile, { contentType: photoFile.type || "image/jpeg" });
@@ -816,7 +843,7 @@ export default function App() {
 
     const { data } = supabase.storage.from(PHOTO_BUCKET).getPublicUrl(path);
     return data.publicUrl;
-  }, [photo, photoFile]);
+  }, [activeEventId, photo, photoFile]);
 
   const handleJoin = useCallback(async () => {
     if (isSaving) return;
@@ -845,7 +872,7 @@ export default function App() {
       };
 
       if (supabase) {
-        const { error } = await supabase.from("participants").insert(cardToInsert(nextCard));
+        const { error } = await supabase.from("participants").insert(cardToInsert(nextCard, activeEventId));
         if (error) throw error;
       }
 
@@ -859,7 +886,7 @@ export default function App() {
     } finally {
       setIsSaving(false);
     }
-  }, [isSaving, cards.length, uploadPhoto, name, photo, email, profession, interests, skills, futureInterests, futureBets, placedStickers, cardBg]);
+  }, [activeEventId, isSaving, cards.length, uploadPhoto, name, photo, email, profession, interests, skills, futureInterests, futureBets, placedStickers, cardBg]);
 
   const saveResolvedBets = useCallback(async () => {
     if (adminSaving) return;
@@ -890,7 +917,7 @@ export default function App() {
         rotation: 0,
       };
 
-      const { error } = await supabase.from("participants").insert(cardToInsert(resultCard, RESULTS_EVENT_ID));
+      const { error } = await supabase.from("participants").insert(cardToInsert(resultCard, activeResultsEventId));
       if (error) throw error;
       setAdminMessage("Classifica aggiornata. La board usa già queste feature come risultati ufficiali.");
     } catch (error) {
@@ -901,7 +928,7 @@ export default function App() {
     } finally {
       setAdminSaving(false);
     }
-  }, [adminSaving, resolvedBets]);
+  }, [activeResultsEventId, adminSaving, resolvedBets]);
 
   const resetForm = () => {
     setStep(1); setName(""); setPhoto(null); setPhotoFile(null); setEmail(""); setProfession("");
@@ -939,6 +966,65 @@ export default function App() {
     textBoxEdge: "cap alphabetic",
   } as React.CSSProperties;
 
+  if (view === "location") return (
+    <div style={{ width: "100vw", minHeight: "100dvh", background: DARK, color: "#fff", fontFamily: F, display: "flex", alignItems: "center", justifyContent: "center", padding: 24, overflow: "auto" }}>
+      <div style={{ width: "100%", maxWidth: 420 }}>
+        <motion.div
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <p style={{ margin: "0 0 14px", color: ORANGE, textTransform: "uppercase", letterSpacing: "0.08em", fontSize: 12, fontWeight: 900, fontFamily: FB }}>
+            Scegli il tuo filone
+          </p>
+          <h1 style={{ margin: "0 0 12px", color: "#D9D9D9", fontSize: 54, lineHeight: 0.92, letterSpacing: "-1.62px", fontWeight: 400, fontFamily: F }}>
+            Da dove partecipi?
+          </h1>
+          <p style={{ margin: "0 0 28px", color: "rgba(255,255,255,0.58)", fontSize: 17, lineHeight: 1.35, maxWidth: 340 }}>
+            Teniamo separate board, card e classifiche per città. Così ogni gruppo ha il suo spazio pulito.
+          </p>
+
+          <div style={{ display: "grid", gap: 12 }}>
+            {LOCATION_OPTIONS.map((location, index) => {
+              const active = selectedLocation === location.id;
+              return (
+                <motion.button
+                  key={location.id}
+                  initial={{ opacity: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.05, type: "spring", stiffness: 420, damping: 26 }}
+                  whileTap={{ scale: 0.96 }}
+                  onClick={() => chooseLocation(location.id)}
+                  style={{
+                    minHeight: 74,
+                    borderRadius: 12,
+                    border: active ? `2px solid ${location.accent}` : "1.5px solid rgba(255,255,255,0.12)",
+                    background: active ? `${location.accent}22` : "#2A2A2A",
+                    color: "#fff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    padding: "0 18px",
+                    cursor: "pointer",
+                    boxShadow: active ? `0 0 0 1px ${location.accent}33, inset 0 1px 0 rgba(255,255,255,0.08)` : "inset 0 1px 0 rgba(255,255,255,0.05)",
+                  }}
+                >
+                  <span style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <span style={{ width: 34, height: 34, borderRadius: "50%", background: location.accent, color: DARK, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                      <MapPin size={17} />
+                    </span>
+                    <span style={{ fontSize: 24, fontWeight: 900, fontFamily: FB, letterSpacing: "-0.5px" }}>{location.label}</span>
+                  </span>
+                  <ChevronRight size={20} color={active ? location.accent : "rgba(255,255,255,0.3)"} />
+                </motion.button>
+              );
+            })}
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+
   if (view === "admin") return (
     <div style={{ width: "100vw", minHeight: "100dvh", overflow: "auto", background: DARK, color: "#fff", fontFamily: F, padding: "28px 20px 96px" }}>
       <div style={{ maxWidth: 760, margin: "0 auto" }}>
@@ -957,6 +1043,21 @@ export default function App() {
         <p style={{ margin: "0 0 26px", color: "rgba(255,255,255,0.56)", fontSize: 16, lineHeight: 1.4, maxWidth: 560 }}>
           Dopo gli annunci, seleziona le feature uscite davvero. La leaderboard userà queste risposte come risultati ufficiali.
         </p>
+
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 22 }}>
+          {LOCATION_OPTIONS.map(location => {
+            const active = activeLocation.id === location.id;
+            return (
+              <button
+                key={location.id}
+                onClick={() => chooseLocation(location.id, "admin")}
+                style={{ border: active ? `1.5px solid ${location.accent}` : "1.5px solid rgba(255,255,255,0.1)", background: active ? `${location.accent}24` : "rgba(255,255,255,0.06)", color: active ? "#fff" : "rgba(255,255,255,0.5)", borderRadius: 99, padding: "9px 13px", fontSize: 12, fontWeight: 900, fontFamily: FB, cursor: "pointer" }}
+              >
+                {location.label}
+              </button>
+            );
+          })}
+        </div>
 
         {!adminUnlocked ? (
           <form
@@ -1040,6 +1141,13 @@ export default function App() {
       <div style={{ position: "relative", width: "min(100vw, 393px)", height: "100dvh", overflow: "hidden", background: ORANGE }}>
         {/* Figma Home design (fills container) */}
         <HomeScreen />
+
+        <button
+          onClick={() => setView("location")}
+          style={{ position: "absolute", top: 18, right: 18, zIndex: 11, border: "none", borderRadius: 99, background: "rgba(30,30,30,0.92)", color: "#fff", padding: "9px 12px", display: "flex", alignItems: "center", gap: 7, cursor: "pointer", fontSize: 12, fontWeight: 900, fontFamily: FB, boxShadow: "0 10px 26px rgba(0,0,0,0.18)" }}
+        >
+          <MapPin size={13} /> {activeLocation.label}
+        </button>
 
         {/* Transparent click overlays matching Frame2 position in Home design. */}
         <div style={{ position: "absolute", top: "min(391px, calc(100dvh - 150px))", left: "50%", transform: "translateX(-50%)", width: "min(360px, calc(100% - 32px))", display: "flex", flexDirection: "column", gap: 16, zIndex: 10 }}>
@@ -1558,6 +1666,13 @@ export default function App() {
       <button onClick={() => { setView("welcome"); resetForm(); }}
         style={{ position: "fixed", top: 20, left: 20, zIndex: 40, display: "flex", alignItems: "center", gap: 8, padding: "10px 16px", borderRadius: 99, fontSize: 12, fontWeight: 700, border: "none", background: DARK, cursor: "pointer", color: "rgba(255,255,255,0.5)", fontFamily: F }}>
         <ArrowLeft size={13} />
+      </button>
+
+      <button
+        onClick={() => setView("location")}
+        style={{ position: "fixed", top: isPeopleView ? 74 : 20, right: 20, zIndex: 40, display: "flex", alignItems: "center", gap: 7, padding: "10px 13px", borderRadius: 99, fontSize: 12, fontWeight: 900, border: "none", background: DARK, cursor: "pointer", color: "rgba(255,255,255,0.72)", fontFamily: FB }}
+      >
+        <MapPin size={13} /> {activeLocation.label}
       </button>
 
       {/* Filter modal */}
