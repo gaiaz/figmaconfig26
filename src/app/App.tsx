@@ -1577,10 +1577,10 @@ export default function App() {
               <div style={{ width: 36, height: 4, borderRadius: 2, background: "rgba(255,255,255,0.15)", margin: "0 auto 20px" }} />
 
               <h2 style={{ fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: "-0.5px", marginBottom: 6, fontFamily: F }}>
-                Trova persone affini
+                Cerca il tuo match di skill
               </h2>
               <p style={{ fontSize: 13, color: "rgba(255,255,255,0.4)", marginBottom: 20, fontFamily: F }}>
-                Scegli una o più skill e guarda chi può darti una mano o fare due chiacchiere.
+                Scegli cosa ti interessa e scopri con chi vale la pena fare due chiacchiere.
               </p>
 
               {/* Skill chips */}
