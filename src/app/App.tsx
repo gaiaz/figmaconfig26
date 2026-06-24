@@ -1887,21 +1887,21 @@ export default function App() {
               <div style={{ display: "grid", gap: 18 }}>
                 <section>
                   <h4 style={{ margin: "0 0 9px", fontSize: 13, fontWeight: 900, color: "#14AE5C", fontFamily: FB }}>
-                    Azzeccate
+                    Ha indovinato
                   </h4>
-                  {renderBetRows(betDetailCorrect, "Nessuna prediction azzeccata per ora. Si rifà al prossimo Config.")}
+                  {renderBetRows(betDetailCorrect, "Per ora non ha indovinato nessuna feature uscita.")}
                 </section>
                 <section>
                   <h4 style={{ margin: "0 0 9px", fontSize: 13, fontWeight: 900, color: ORANGE, fontFamily: FB }}>
-                    Puntate, ma non confermate
+                    Aveva puntato su queste, ma non sono uscite
                   </h4>
-                  {renderBetRows(betDetailWrong, "Nessuna prediction sbagliata: profilo chirurgico.")}
+                  {renderBetRows(betDetailWrong, "Non aveva scelto feature rimaste fuori dagli annunci.")}
                 </section>
                 <section>
                   <h4 style={{ margin: "0 0 9px", fontSize: 13, fontWeight: 900, color: "rgba(255,255,255,0.56)", fontFamily: FB }}>
-                    Uscite, ma non scelte
+                    Sono uscite, ma non le aveva scelte
                   </h4>
-                  {renderBetRows(betDetailMissed, "Non ha mancato nessuna feature confermata.")}
+                  {renderBetRows(betDetailMissed, "Ha scelto tutte le feature che poi sono state confermate.")}
                 </section>
               </div>
             </motion.div>
