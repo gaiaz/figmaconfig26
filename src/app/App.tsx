@@ -1495,14 +1495,39 @@ export default function App() {
 
   // ── Shared chrome (toolbar + FABs + filter modal) ─────────────────────────
 
+  const isPeopleView = viewMode === "board" || viewMode === "stack";
+  const activeSection = isPeopleView ? "people" : viewMode;
+
   const SharedChrome = () => (
     <>
       {/* Toolbar */}
-      <div style={{ position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", alignItems: "center", gap: 10, padding: "8px 12px 8px 16px", borderRadius: 99, background: DARK, whiteSpace: "nowrap" }}>
+      <div style={{ position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", alignItems: "center", gap: 8, padding: "8px 10px 8px 14px", borderRadius: 99, background: DARK, whiteSpace: "nowrap" }}>
         <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.6)", fontFamily: F }}>
           {visibleCards.length}{filterSkills.length > 0 ? `/${cards.length}` : ""} persone
         </span>
         <div style={{ padding: "4px 10px", borderRadius: 99, fontSize: 11, fontWeight: 700, background: ORANGE, color: DARK, fontFamily: FB }}>Live</div>
+        {isPeopleView && (
+          <div style={{ position: "relative", width: 66, height: 30, borderRadius: 99, background: "rgba(255,255,255,0.08)", padding: 3, display: "grid", gridTemplateColumns: "1fr 1fr", overflow: "hidden" }}>
+            <motion.div
+              aria-hidden
+              animate={{ x: viewMode === "stack" ? 33 : 0 }}
+              transition={{ type: "spring", stiffness: 520, damping: 34 }}
+              style={{ position: "absolute", top: 3, left: 3, width: 27, height: 24, borderRadius: 99, background: ORANGE }}
+            />
+            <button
+              onClick={() => { setViewMode("board"); setStackIndex(0); }}
+              aria-label="Vista board"
+              style={{ position: "relative", zIndex: 1, border: "none", background: "transparent", color: viewMode === "board" ? DARK : "rgba(255,255,255,0.62)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", padding: 0 }}>
+              <LayoutGrid size={14} />
+            </button>
+            <button
+              onClick={() => { setViewMode("stack"); setStackIndex(0); }}
+              aria-label="Vista card"
+              style={{ position: "relative", zIndex: 1, border: "none", background: "transparent", color: viewMode === "stack" ? DARK : "rgba(255,255,255,0.62)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", padding: 0 }}>
+              <Layers size={14} />
+            </button>
+          </div>
+        )}
         <button
           onClick={() => setFilterOpen(true)}
           aria-label="Filtra per skill"
@@ -1663,61 +1688,35 @@ export default function App() {
       justifyContent: "center",
       boxShadow: active ? "0 8px 28px rgba(255,114,55,0.34)" : "none",
     });
-    const toggleIcon = (active: boolean): React.CSSProperties => ({
-      width: 52,
-      height: 52,
-      borderRadius: "50%",
-      border: "none",
-      cursor: "pointer",
-      background: "transparent",
-      color: icon(active),
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      position: "relative",
-      zIndex: 2,
-    });
 
     return (
-      <div style={{ position: "fixed", bottom: "calc(18px + env(safe-area-inset-bottom, 0px))", left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", gap: 8, alignItems: "center", justifyContent: "center", width: "calc(100vw - 20px)", pointerEvents: "none" }}>
-        <div style={{ position: "relative", height: 62, width: 122, borderRadius: 99, background: "#2A2A2A", padding: 5, display: "grid", gridTemplateColumns: "1fr 1fr", pointerEvents: "auto", overflow: "hidden" }}>
-          <motion.div
-            aria-hidden
-            animate={{ x: viewMode === "stack" ? 60 : 0 }}
-            transition={{ type: "spring", stiffness: 520, damping: 34 }}
-            style={{ position: "absolute", top: 5, left: 5, width: 52, height: 52, borderRadius: "50%", background: ORANGE, boxShadow: "0 9px 30px rgba(255,114,55,0.36)" }}
-          />
-          <button
-            onClick={() => { setViewMode("board"); setStackIndex(0); }}
-            aria-label="Mostra board"
-            style={toggleIcon(viewMode === "board")}>
-            <LayoutGrid size={22} color={icon(viewMode === "board")} />
-          </button>
-          <button
-            onClick={() => { setViewMode("stack"); setStackIndex(0); }}
-            aria-label="Mostra card"
-            style={toggleIcon(viewMode === "stack")}>
-            <Layers size={22} color={icon(viewMode === "stack")} />
-          </button>
-        </div>
+      <div style={{ position: "fixed", bottom: "calc(18px + env(safe-area-inset-bottom, 0px))", left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", alignItems: "center", justifyContent: "center", width: "calc(100vw - 20px)", pointerEvents: "none" }}>
+        <nav aria-label="Sezioni" style={{ height: 62, borderRadius: 99, background: "#2A2A2A", padding: 5, display: "grid", gridTemplateColumns: "repeat(4, 54px)", gap: 4, pointerEvents: "auto", boxShadow: "0 12px 34px rgba(0,0,0,0.28)" }}>
+        <button
+          onClick={() => setViewMode(viewMode === "stack" ? "stack" : "board")}
+          aria-label="Mostra persone"
+          style={circle(activeSection === "people")}>
+          <LayoutGrid size={22} color={icon(activeSection === "people")} />
+        </button>
         <button
           onClick={() => setViewMode("insights")}
           aria-label="Mostra insights"
-          style={{ ...circle(viewMode === "insights"), pointerEvents: "auto" }}>
-          <Sparkles size={22} color={icon(viewMode === "insights")} />
+          style={circle(activeSection === "insights")}>
+          <Sparkles size={22} color={icon(activeSection === "insights")} />
         </button>
         <button
           onClick={() => setViewMode("bets")}
           aria-label="Mostra bets"
-          style={{ ...circle(viewMode === "bets"), pointerEvents: "auto" }}>
-          <Trophy size={22} color={icon(viewMode === "bets")} />
+          style={circle(activeSection === "bets")}>
+          <Trophy size={22} color={icon(activeSection === "bets")} />
         </button>
         <button
           onClick={() => setViewMode("resources")}
           aria-label="Mostra risorse"
-          style={{ ...circle(viewMode === "resources"), pointerEvents: "auto" }}>
-          <BookOpen size={22} color={icon(viewMode === "resources")} />
+          style={circle(activeSection === "resources")}>
+          <BookOpen size={22} color={icon(activeSection === "resources")} />
         </button>
+        </nav>
       </div>
     );
   };
