@@ -9,6 +9,7 @@ import HomeScreen from "@/imports/Home/index";
 import {
   EVENT_ID,
   PHOTO_BUCKET,
+  RESULTS_EVENT_ID,
   cardToInsert,
   isSupabaseConfigured,
   rowToCard,
@@ -22,6 +23,7 @@ import type { PlacedSticker, VCardData } from "./types";
 // Plus Jakarta Sans = bold labels/buttons
 const F  = "'Figma Sans Text', 'Plus Jakarta Sans', system-ui, sans-serif";
 const FB = "'Plus Jakarta Sans', 'Figma Sans Text', system-ui, sans-serif"; // bold UI
+const ADMIN_CODE = (import.meta.env.VITE_ADMIN_CODE as string | undefined) || "config2026";
 
 // ─── Palette ─────────────────────────────────────────────────────────────────
 const ORANGE = "#FF7237";
@@ -616,7 +618,7 @@ function FormInput({ value, onChange, placeholder, type = "text", icon }: {
 }
 
 // PrimaryBtn — orange bg, radius 4, dark text (diff #3 #10 #11 #30)
-function PrimaryBtn({ onClick, disabled, children }: { onClick: () => void; disabled?: boolean; children: React.ReactNode }) {
+function PrimaryBtn({ onClick, disabled, children }: { onClick?: () => void; disabled?: boolean; children: React.ReactNode }) {
   return (
     <motion.button onClick={onClick} disabled={!!disabled}
       whileTap={disabled ? {} : { scale: 0.96 }}
@@ -638,12 +640,17 @@ function PrimaryBtn({ onClick, disabled, children }: { onClick: () => void; disa
 
 // ─── App ──────────────────────────────────────────────────────────────────────
 
-type View = "welcome" | "form" | "canvas";
+type View = "welcome" | "form" | "canvas" | "admin";
 
 export default function App() {
-  const [view, setView]           = useState<View>("welcome");
+  const [view, setView]           = useState<View>(() => window.location.pathname === "/admin" ? "admin" : "welcome");
   const [step, setStep]           = useState(1);
   const [cards, setCards]         = useState<VCardData[]>(EXISTING_CARDS);
+  const [resolvedBets, setResolvedBets] = useState<string[]>(RESOLVED_BETS);
+  const [adminUnlocked, setAdminUnlocked] = useState(false);
+  const [adminCode, setAdminCode] = useState("");
+  const [adminMessage, setAdminMessage] = useState<string | null>(null);
+  const [adminSaving, setAdminSaving] = useState(false);
   const [filterSkills, setFilterSkills] = useState<string[]>([]);
   const [filterOpen, setFilterOpen]       = useState(false);
   const [skillsCard, setSkillsCard]       = useState<Omit<VCardData, "x"|"y"|"rotation"> | null>(null);
@@ -697,9 +704,23 @@ export default function App() {
       setCards((data as ParticipantRow[]).map(rowToCard));
     };
 
-    void loadParticipants();
+    const loadResults = async () => {
+      const { data, error } = await supabase
+        .from("participants")
+        .select("future_bets")
+        .eq("event_id", RESULTS_EVENT_ID)
+        .order("created_at", { ascending: false })
+        .limit(1);
 
-    const channel = supabase
+      if (cancelled || error) return;
+      const latest = data?.[0] as Pick<ParticipantRow, "future_bets"> | undefined;
+      if (latest?.future_bets) setResolvedBets(latest.future_bets);
+    };
+
+    void loadParticipants();
+    void loadResults();
+
+    const participantChannel = supabase
       .channel(`participants:${EVENT_ID}`)
       .on(
         "postgres_changes",
@@ -711,9 +732,22 @@ export default function App() {
       )
       .subscribe();
 
+    const resultsChannel = supabase
+      .channel(`future-bet-results:${EVENT_ID}`)
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "participants", filter: `event_id=eq.${RESULTS_EVENT_ID}` },
+        payload => {
+          const row = payload.new as ParticipantRow;
+          setResolvedBets(row.future_bets || []);
+        }
+      )
+      .subscribe();
+
     return () => {
       cancelled = true;
-      void supabase.removeChannel(channel);
+      void supabase.removeChannel(participantChannel);
+      void supabase.removeChannel(resultsChannel);
     };
   }, []);
 
@@ -785,6 +819,48 @@ export default function App() {
     }
   }, [isSaving, cards.length, uploadPhoto, name, photo, email, profession, interests, skills, futureInterests, futureBets, placedStickers, cardBg]);
 
+  const saveResolvedBets = useCallback(async () => {
+    if (adminSaving) return;
+    setAdminSaving(true);
+    setAdminMessage(null);
+
+    try {
+      if (!supabase) {
+        setAdminMessage("Supabase non è configurato: posso mostrare la selezione, ma non salvarla online.");
+        return;
+      }
+
+      const resultCard: VCardData = {
+        id: crypto.randomUUID(),
+        name: "Future Bets Results",
+        photo: null,
+        email: "admin@config.local",
+        profession: "Admin",
+        interests: [],
+        skills: [],
+        futureInterests: [],
+        futureBets: resolvedBets,
+        placedStickers: [],
+        accentColor: ORANGE,
+        cardBg: ORANGE,
+        x: 0,
+        y: 0,
+        rotation: 0,
+      };
+
+      const { error } = await supabase.from("participants").insert(cardToInsert(resultCard, RESULTS_EVENT_ID));
+      if (error) throw error;
+      setAdminMessage("Classifica aggiornata. La board usa già queste feature come risultati ufficiali.");
+    } catch (error) {
+      const message = typeof error === "object" && error && "message" in error
+        ? String((error as { message?: unknown }).message)
+        : "Non riesco a salvare i risultati. Riprova tra poco.";
+      setAdminMessage(message);
+    } finally {
+      setAdminSaving(false);
+    }
+  }, [adminSaving, resolvedBets]);
+
   const resetForm = () => {
     setStep(1); setName(""); setPhoto(null); setPhotoFile(null); setEmail(""); setProfession("");
     setInterests([]); setSkills([]); setFutureInterests([]); setFutureBets([]); setPlacedStickers([]); setCardBg(BG_PALETTE[0]);
@@ -820,6 +896,100 @@ export default function App() {
     textBoxTrim: "trim-both",  // diff #33
     textBoxEdge: "cap alphabetic",
   } as React.CSSProperties;
+
+  if (view === "admin") return (
+    <div style={{ width: "100vw", minHeight: "100dvh", overflow: "auto", background: DARK, color: "#fff", fontFamily: F, padding: "28px 20px 96px" }}>
+      <div style={{ maxWidth: 760, margin: "0 auto" }}>
+        <button
+          onClick={() => { window.history.pushState(null, "", "/"); setView("canvas"); }}
+          style={{ display: "inline-flex", alignItems: "center", gap: 8, border: "none", background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.64)", borderRadius: 99, padding: "10px 14px", fontSize: 13, fontWeight: 800, fontFamily: FB, cursor: "pointer", marginBottom: 28 }}>
+          <ArrowLeft size={14} /> Vai alla board
+        </button>
+
+        <p style={{ margin: "0 0 12px", color: ORANGE, textTransform: "uppercase", letterSpacing: "0.08em", fontSize: 12, fontWeight: 900, fontFamily: FB }}>
+          Admin segreto
+        </p>
+        <h1 style={{ margin: "0 0 12px", color: "#D9D9D9", fontSize: 46, lineHeight: 0.96, letterSpacing: "-1.38px", fontWeight: 400, fontFamily: F }}>
+          Risultati Figma Future Bets
+        </h1>
+        <p style={{ margin: "0 0 26px", color: "rgba(255,255,255,0.56)", fontSize: 16, lineHeight: 1.4, maxWidth: 560 }}>
+          Dopo gli annunci, seleziona le feature uscite davvero. La leaderboard userà queste risposte come risultati ufficiali.
+        </p>
+
+        {!adminUnlocked ? (
+          <form
+            onSubmit={(event) => {
+              event.preventDefault();
+              if (adminCode.trim() === ADMIN_CODE) {
+                setAdminUnlocked(true);
+                setAdminMessage(null);
+              } else {
+                setAdminMessage("Codice non corretto.");
+              }
+            }}
+            style={{ background: "#2A2A2A", borderRadius: 10, padding: 18, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.06)" }}>
+            <label style={{ display: "block", color: "rgba(255,255,255,0.54)", fontSize: 13, fontWeight: 800, fontFamily: FB, marginBottom: 10 }}>
+              Codice admin
+            </label>
+            <input
+              value={adminCode}
+              onChange={(event) => setAdminCode(event.target.value)}
+              placeholder="Inserisci codice"
+              type="password"
+              autoFocus
+              style={{ width: "100%", height: 54, borderRadius: 8, border: "1.5px solid rgba(255,255,255,0.12)", background: "rgba(255,255,255,0.06)", color: "#fff", padding: "0 14px", fontSize: 16, fontWeight: 800, fontFamily: FB, marginBottom: 14 }}
+            />
+            <PrimaryBtn>Entra</PrimaryBtn>
+            {adminMessage && (
+              <p style={{ margin: "14px 0 0", color: ORANGE, fontSize: 13, fontWeight: 800, fontFamily: FB }}>{adminMessage}</p>
+            )}
+          </form>
+        ) : (
+          <>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, marginBottom: 14 }}>
+              <div style={{ color: "rgba(255,255,255,0.58)", fontSize: 13, lineHeight: 1.35 }}>
+                {resolvedBets.length === 0 ? "Nessuna feature confermata." : `${resolvedBets.length} feature confermate.`}
+              </div>
+              <button
+                onClick={() => setResolvedBets([])}
+                style={{ border: "none", background: "rgba(255,255,255,0.08)", color: "rgba(255,255,255,0.56)", borderRadius: 99, padding: "9px 12px", fontSize: 12, fontWeight: 800, fontFamily: FB, cursor: "pointer" }}>
+                Reset
+              </button>
+            </div>
+
+            <div style={{ display: "grid", gap: 10, marginBottom: 18 }}>
+              {FUTURE_BET_OPTIONS.map((bet) => {
+                const active = resolvedBets.includes(bet.id);
+                return (
+                  <button
+                    key={bet.id}
+                    onClick={() => setResolvedBets(prev => active ? prev.filter(id => id !== bet.id) : [...prev, bet.id])}
+                    style={{ textAlign: "left", borderRadius: 10, border: active ? `1.5px solid ${bet.color}` : "1.5px solid rgba(255,255,255,0.1)", background: active ? `${bet.color}24` : "#2A2A2A", color: "#fff", padding: 14, cursor: "pointer", boxShadow: active ? `0 0 0 1px ${bet.color}33` : "inset 0 1px 0 rgba(255,255,255,0.05)" }}>
+                    <span style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                      <span style={{ width: 18, height: 18, borderRadius: "50%", border: `2px solid ${active ? bet.color : "rgba(255,255,255,0.24)"}`, background: active ? bet.color : "transparent", flexShrink: 0, marginTop: 1 }} />
+                      <span>
+                        <span style={{ display: "block", fontSize: 15, fontWeight: 900, lineHeight: 1.12, fontFamily: FB }}>{bet.label}</span>
+                        <span style={{ display: "block", marginTop: 6, color: "rgba(255,255,255,0.48)", fontSize: 12, lineHeight: 1.35 }}>{bet.description}</span>
+                      </span>
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <PrimaryBtn onClick={saveResolvedBets} disabled={adminSaving}>
+              {adminSaving ? "Salvo..." : "Salva risultati ufficiali"}
+            </PrimaryBtn>
+            {adminMessage && (
+              <p style={{ margin: "14px 0 0", color: adminMessage.includes("aggiornata") ? "#14AE5C" : ORANGE, fontSize: 13, fontWeight: 800, lineHeight: 1.35, fontFamily: FB }}>
+                {adminMessage}
+              </p>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
 
   // ── WELCOME — render Figma Home import with interactive buttons overlaid ──
 
@@ -1243,7 +1413,7 @@ export default function App() {
   const betLeaderboard = cards
     .map(card => ({
       ...card,
-      score: card.futureBets.filter(id => RESOLVED_BETS.includes(id)).length,
+      score: card.futureBets.filter(id => resolvedBets.includes(id)).length,
     }))
     .sort((a, b) => b.score - a.score);
 
@@ -1612,11 +1782,11 @@ export default function App() {
               </p>
             </div>
             <div style={{ borderRadius: 99, background: "rgba(255,114,55,0.14)", color: ORANGE, padding: "7px 10px", fontSize: 11, fontWeight: 800, fontFamily: FB }}>
-              {RESOLVED_BETS.length === 0 ? "In attesa" : `${RESOLVED_BETS.length} confermate`}
+              {resolvedBets.length === 0 ? "In attesa" : `${resolvedBets.length} confermate`}
             </div>
           </div>
 
-          {RESOLVED_BETS.length === 0 ? (
+          {resolvedBets.length === 0 ? (
             <div style={{ borderRadius: 6, background: "rgba(255,255,255,0.05)", padding: 14, fontSize: 13, lineHeight: 1.35, color: "rgba(255,255,255,0.56)" }}>
               Dopo Config inseriamo nel codice le feature annunciate davvero e questa card mostra automaticamente chi ha indovinato di più.
             </div>

@@ -6,6 +6,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
 export const EVENT_ID = (import.meta.env.VITE_EVENT_ID as string | undefined) || "config-watch-party";
+export const RESULTS_EVENT_ID = `${EVENT_ID}:future-bet-results`;
 export const PHOTO_BUCKET = (import.meta.env.VITE_SUPABASE_PHOTO_BUCKET as string | undefined) || "participant-photos";
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 
