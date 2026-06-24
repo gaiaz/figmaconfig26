@@ -1506,28 +1506,6 @@ export default function App() {
           {visibleCards.length}{filterSkills.length > 0 ? `/${cards.length}` : ""} persone
         </span>
         <div style={{ padding: "4px 10px", borderRadius: 99, fontSize: 11, fontWeight: 700, background: ORANGE, color: DARK, fontFamily: FB }}>Live</div>
-        {isPeopleView && (
-          <div style={{ position: "relative", width: 66, height: 30, borderRadius: 99, background: "rgba(255,255,255,0.08)", padding: 3, display: "grid", gridTemplateColumns: "1fr 1fr", overflow: "hidden" }}>
-            <motion.div
-              aria-hidden
-              animate={{ x: viewMode === "stack" ? 33 : 0 }}
-              transition={{ type: "spring", stiffness: 520, damping: 34 }}
-              style={{ position: "absolute", top: 3, left: 3, width: 27, height: 24, borderRadius: 99, background: ORANGE }}
-            />
-            <button
-              onClick={() => { setViewMode("board"); setStackIndex(0); }}
-              aria-label="Vista board"
-              style={{ position: "relative", zIndex: 1, border: "none", background: "transparent", color: viewMode === "board" ? DARK : "rgba(255,255,255,0.62)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", padding: 0 }}>
-              <LayoutGrid size={14} />
-            </button>
-            <button
-              onClick={() => { setViewMode("stack"); setStackIndex(0); }}
-              aria-label="Vista card"
-              style={{ position: "relative", zIndex: 1, border: "none", background: "transparent", color: viewMode === "stack" ? DARK : "rgba(255,255,255,0.62)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", padding: 0 }}>
-              <Layers size={14} />
-            </button>
-          </div>
-        )}
         <button
           onClick={() => setFilterOpen(true)}
           aria-label="Filtra per skill"
@@ -1552,6 +1530,29 @@ export default function App() {
           )}
         </button>
       </div>
+
+      {isPeopleView && (
+        <div style={{ position: "fixed", top: 64, left: "50%", transform: "translateX(-50%)", zIndex: 39, width: 164, height: 42, borderRadius: 99, background: "rgba(30,30,30,0.92)", padding: 4, display: "grid", gridTemplateColumns: "1fr 1fr", overflow: "hidden", boxShadow: "0 10px 28px rgba(0,0,0,0.22)" }}>
+          <motion.div
+            aria-hidden
+            animate={{ x: viewMode === "stack" ? 78 : 0 }}
+            transition={{ type: "spring", stiffness: 520, damping: 34 }}
+            style={{ position: "absolute", top: 4, left: 4, width: 78, height: 34, borderRadius: 99, background: ORANGE }}
+          />
+          <button
+            onClick={() => { setViewMode("board"); setStackIndex(0); }}
+            aria-label="Vista board"
+            style={{ position: "relative", zIndex: 1, border: "none", background: "transparent", color: viewMode === "board" ? DARK : "rgba(255,255,255,0.64)", display: "flex", alignItems: "center", justifyContent: "center", gap: 5, cursor: "pointer", padding: 0, fontSize: 12, fontWeight: 900, fontFamily: FB }}>
+            <LayoutGrid size={14} /> Board
+          </button>
+          <button
+            onClick={() => { setViewMode("stack"); setStackIndex(0); }}
+            aria-label="Vista card"
+            style={{ position: "relative", zIndex: 1, border: "none", background: "transparent", color: viewMode === "stack" ? DARK : "rgba(255,255,255,0.64)", display: "flex", alignItems: "center", justifyContent: "center", gap: 5, cursor: "pointer", padding: 0, fontSize: 12, fontWeight: 900, fontFamily: FB }}>
+            <Layers size={14} /> Stack
+          </button>
+        </div>
+      )}
 
       {/* Home button */}
       <button onClick={() => { setView("welcome"); resetForm(); }}
@@ -2040,8 +2041,8 @@ export default function App() {
   return (
     <div style={{ width: "100vw", height: "100dvh", overflow: "hidden", background: DARK, fontFamily: F, display: "flex", flexDirection: "column", alignItems: "center" }}>
 
-      {/* Card deck — fills available space between toolbar (80px) and bottom controls (96px) */}
-      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", paddingTop: 80 }}>
+      {/* Card deck — fills available space between the top controls and bottom tabs */}
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", paddingTop: 116 }}>
         {visibleCards.length === 0 ? (
           <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 16, textAlign: "center" }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>

@@ -300,9 +300,9 @@ function Frame() {
 
 function Frame1() {
   return (
-    <div className="[word-break:break-word] absolute content-stretch flex flex-col font-['Figma_Sans_Text:Regular',sans-serif] gap-[24px] items-center justify-center left-[29px] not-italic text-[#1e1e1e] top-[209px] whitespace-nowrap">
-      <p className="[text-box-edge:cap_alphabetic] [text-box-trim:trim-both] leading-[24.363px] relative shrink-0 text-[55.372px] tracking-[-4.4298px]">Config Board</p>
-      <p className="[text-box-edge:cap_alphabetic] [text-box-trim:trim-both] leading-[1.2] relative shrink-0 text-[24.999px] tracking-[-1.9999px]">Crea la tua card e incontra persone affini!</p>
+    <div className="[word-break:break-word] -translate-x-1/2 absolute content-stretch flex flex-col font-['Figma_Sans_Text:Regular',sans-serif] gap-[24px] items-center justify-center left-1/2 not-italic px-[20px] text-[#1e1e1e] text-center top-[209px] w-full">
+      <p className="[text-box-edge:cap_alphabetic] [text-box-trim:trim-both] leading-[24.363px] relative shrink-0 text-[55.372px] tracking-[-4.4298px] whitespace-nowrap">Config Board</p>
+      <p className="[text-box-edge:cap_alphabetic] [text-box-trim:trim-both] leading-[1.2] max-w-[340px] relative shrink-0 text-[24.999px] tracking-[-1.9999px]">Crea la tua card e incontra persone affini!</p>
     </div>
   );
 }
