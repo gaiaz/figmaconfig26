@@ -980,11 +980,8 @@ export default function App() {
           <h1 style={{ margin: "0 0 12px", color: "#D9D9D9", fontSize: 54, lineHeight: 0.92, letterSpacing: "-1.62px", fontWeight: 400, fontFamily: F }}>
             Da dove partecipi?
           </h1>
-          <p style={{ margin: "0 0 28px", color: "rgba(255,255,255,0.58)", fontSize: 17, lineHeight: 1.35, maxWidth: 340 }}>
-            Teniamo separate board, card e classifiche per città. Così ogni gruppo ha il suo spazio pulito.
-          </p>
 
-          <div style={{ display: "grid", gap: 12 }}>
+          <div style={{ display: "grid", gap: 12, marginTop: 28 }}>
             {LOCATION_OPTIONS.map((location, index) => {
               const active = selectedLocation === location.id;
               return (
@@ -1144,7 +1141,7 @@ export default function App() {
 
         <button
           onClick={() => setView("location")}
-          style={{ position: "absolute", top: 18, right: 18, zIndex: 11, border: "none", borderRadius: 99, background: "rgba(30,30,30,0.92)", color: "#fff", padding: "9px 12px", display: "flex", alignItems: "center", gap: 7, cursor: "pointer", fontSize: 12, fontWeight: 900, fontFamily: FB, boxShadow: "0 10px 26px rgba(0,0,0,0.18)" }}
+          style={{ position: "absolute", left: "50%", bottom: "calc(18px + env(safe-area-inset-bottom, 0px))", transform: "translateX(-50%)", zIndex: 11, border: "none", borderRadius: 99, background: "rgba(30,30,30,0.92)", color: "#fff", padding: "10px 14px", display: "flex", alignItems: "center", gap: 7, cursor: "pointer", fontSize: 12, fontWeight: 900, fontFamily: FB, boxShadow: "0 10px 26px rgba(0,0,0,0.18)" }}
         >
           <MapPin size={13} /> {activeLocation.label}
         </button>
@@ -1666,13 +1663,6 @@ export default function App() {
       <button onClick={() => { setView("welcome"); resetForm(); }}
         style={{ position: "fixed", top: 20, left: 20, zIndex: 40, display: "flex", alignItems: "center", gap: 8, padding: "10px 16px", borderRadius: 99, fontSize: 12, fontWeight: 700, border: "none", background: DARK, cursor: "pointer", color: "rgba(255,255,255,0.5)", fontFamily: F }}>
         <ArrowLeft size={13} />
-      </button>
-
-      <button
-        onClick={() => setView("location")}
-        style={{ position: "fixed", top: isPeopleView ? 74 : 20, right: 20, zIndex: 40, display: "flex", alignItems: "center", gap: 7, padding: "10px 13px", borderRadius: 99, fontSize: 12, fontWeight: 900, border: "none", background: DARK, cursor: "pointer", color: "rgba(255,255,255,0.72)", fontFamily: FB }}
-      >
-        <MapPin size={13} /> {activeLocation.label}
       </button>
 
       {/* Filter modal */}
