@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import {
   Camera, Mail, Briefcase, Sparkles, ChevronRight,
   ArrowLeft, X, Plus,
-  SlidersHorizontal, Layers, LayoutGrid, RotateCcw, RotateCw, Trophy, BookOpen,
+  SlidersHorizontal, Layers, LayoutGrid, Trophy, BookOpen,
 } from "lucide-react";
 import HomeScreen from "@/imports/Home/index";
 import {
@@ -284,16 +284,19 @@ function StickerEl({ id, scale = 1 }: { id: string; scale?: number }) {
 
 // ─── Editable sticker — drag with one finger, pinch to scale, no control strip ─
 
-function EditableSticker({ sticker, onRemove, onMove, onScale, onRotate, cardScale }: {
+function EditableSticker({ sticker, onRemove, onMove, onScale, onRotate, onLayerToggle, layerIndex, cardScale }: {
   sticker: PlacedSticker;
   onRemove: () => void;
   onMove: (x: number, y: number) => void;
   onScale: (factor: number) => void;
   onRotate: (degrees: number) => void;
+  onLayerToggle: () => void;
+  layerIndex: number;
   cardScale: number;
 }) {
   const st = STICKER_MAP[sticker.type];
   const divRef = useRef<HTMLDivElement>(null);
+  const lastTouchLayerToggleRef = useRef(0);
 
   // Keep latest values accessible inside non-reactive native listeners
   const sRef   = useRef(sticker);   sRef.current   = sticker;
@@ -301,6 +304,7 @@ function EditableSticker({ sticker, onRemove, onMove, onScale, onRotate, cardSca
   const omRef  = useRef(onMove);    omRef.current  = onMove;
   const osRef  = useRef(onScale);   osRef.current  = onScale;
   const orRef  = useRef(onRotate);  orRef.current  = onRotate;
+  const olRef  = useRef(onLayerToggle); olRef.current = onLayerToggle;
 
   // Native non-passive touch events for mobile pinch-to-scale + drag
   useEffect(() => {
@@ -310,6 +314,8 @@ function EditableSticker({ sticker, onRemove, onMove, onScale, onRotate, cardSca
     let dist0: number | null = null;
     let angle0: number | null = null;
     let dragStart: { px: number; py: number; sx: number; sy: number } | null = null;
+    let tapStart: { px: number; py: number } | null = null;
+    let moved = false;
     const angle = (a: Touch, b: Touch) => Math.atan2(b.clientY - a.clientY, b.clientX - a.clientX) * 180 / Math.PI;
 
     const onTS = (e: TouchEvent) => {
@@ -321,9 +327,13 @@ function EditableSticker({ sticker, onRemove, onMove, onScale, onRotate, cardSca
         );
         angle0 = angle(e.touches[0], e.touches[1]);
         dragStart = null;
+        tapStart = null;
+        moved = true;
       } else if (e.touches.length === 1) {
         const s = sRef.current;
         dragStart = { px: e.touches[0].clientX, py: e.touches[0].clientY, sx: s.x, sy: s.y };
+        tapStart = { px: e.touches[0].clientX, py: e.touches[0].clientY };
+        moved = false;
       }
     };
 
@@ -331,6 +341,7 @@ function EditableSticker({ sticker, onRemove, onMove, onScale, onRotate, cardSca
       e.preventDefault(); // non-passive: must use native listener
       e.stopPropagation();
       if (e.touches.length >= 2 && dist0 !== null && dist0 > 5) {
+        moved = true;
         const d = Math.hypot(
           e.touches[1].clientX - e.touches[0].clientX,
           e.touches[1].clientY - e.touches[0].clientY
@@ -345,6 +356,9 @@ function EditableSticker({ sticker, onRemove, onMove, onScale, onRotate, cardSca
         dist0 = d;
         angle0 = a;
       } else if (e.touches.length === 1 && dragStart) {
+        if (tapStart && Math.hypot(e.touches[0].clientX - tapStart.px, e.touches[0].clientY - tapStart.py) > 6) {
+          moved = true;
+        }
         const sc = csRef.current;
         const dx = (e.touches[0].clientX - dragStart.px) / sc;
         const dy = (e.touches[0].clientY - dragStart.py) / sc;
@@ -357,7 +371,15 @@ function EditableSticker({ sticker, onRemove, onMove, onScale, onRotate, cardSca
         dist0 = null;
         angle0 = null;
       }
-      if (e.touches.length === 0) dragStart = null;
+      if (e.touches.length === 0) {
+        if (tapStart && !moved) {
+          lastTouchLayerToggleRef.current = Date.now();
+          olRef.current();
+        }
+        dragStart = null;
+        tapStart = null;
+        moved = false;
+      }
     };
 
     el.addEventListener("touchstart",  onTS, { passive: false });
@@ -386,7 +408,11 @@ function EditableSticker({ sticker, onRemove, onMove, onScale, onRotate, cardSca
         touchAction: "none",
         userSelect: "none",
         cursor: "grab",
-        zIndex: 10,
+        zIndex: 10 + layerIndex,
+      }}
+      onClick={e => {
+        e.stopPropagation();
+        if (Date.now() - lastTouchLayerToggleRef.current > 450) onLayerToggle();
       }}
     >
       <StickerEl id={sticker.type} scale={sticker.scale * cardScale} />
@@ -402,41 +428,20 @@ function EditableSticker({ sticker, onRemove, onMove, onScale, onRotate, cardSca
           display: "flex", alignItems: "center", justifyContent: "center", zIndex: 20,
         }}
       >×</button>
-      <div style={{ position: "absolute", right: -8, bottom: -8, display: "flex", gap: 4, zIndex: 20 }}>
-        <button
-          onPointerDown={e => e.stopPropagation()}
-          onClick={e => { e.stopPropagation(); onRotate(-15); }}
-          aria-label="Ruota sticker a sinistra"
-          style={{
-            width: 22, height: 22, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.25)",
-            background: DARK, color: "#fff", cursor: "pointer", fontSize: 13, fontWeight: 800,
-            display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1,
-          }}
-        ><RotateCcw size={13} /></button>
-        <button
-          onPointerDown={e => e.stopPropagation()}
-          onClick={e => { e.stopPropagation(); onRotate(15); }}
-          aria-label="Ruota sticker a destra"
-          style={{
-            width: 22, height: 22, borderRadius: "50%", border: "2px solid rgba(255,255,255,0.25)",
-            background: DARK, color: "#fff", cursor: "pointer", fontSize: 13, fontWeight: 800,
-            display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1,
-          }}
-        ><RotateCw size={13} /></button>
-      </div>
     </div>
   );
 }
 
 // ─── Portrait VCard ───────────────────────────────────────────────────────────
 
-function PortraitCard({ card, scale = 1, editMode = false, placedStickers, containerRef, onRemove, onMove, onScale, onRotate, onShowAllSkills }: {
+function PortraitCard({ card, scale = 1, editMode = false, placedStickers, containerRef, onRemove, onMove, onScale, onRotate, onLayerToggle, onShowAllSkills }: {
   card: Omit<VCardData, "x"|"y"|"rotation">; scale?: number; editMode?: boolean;
   placedStickers?: PlacedSticker[]; containerRef?: React.RefObject<HTMLDivElement | null>;
   onRemove?: (id: string) => void;
   onMove?:   (id: string, x: number, y: number) => void;
   onScale?:  (id: string, factor: number) => void;
   onRotate?: (id: string, degrees: number) => void;
+  onLayerToggle?: (id: string) => void;
   onShowAllSkills?: (card: Omit<VCardData, "x"|"y"|"rotation">) => void;
 }) {
   const s = scale;
@@ -455,18 +460,20 @@ function PortraitCard({ card, scale = 1, editMode = false, placedStickers, conta
 
         {/* Coloured header */}
         <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: HH * s, background: card.cardBg || card.accentColor, overflow: "hidden" }}>
-          {stickers.map(st =>
-            editMode && containerRef && onRemove && onMove && onScale && onRotate ? (
+          {stickers.map((st, index) =>
+            editMode && containerRef && onRemove && onMove && onScale && onRotate && onLayerToggle ? (
               <EditableSticker
                 key={st.instanceId} sticker={st}
                 onRemove={() => onRemove(st.instanceId)}
                 onMove={(x, y) => onMove(st.instanceId, x, y)}
                 onScale={f => onScale(st.instanceId, f)}
                 onRotate={degrees => onRotate(st.instanceId, degrees)}
+                onLayerToggle={() => onLayerToggle(st.instanceId)}
+                layerIndex={index}
                 cardScale={s}
               />
             ) : (
-              <div key={st.instanceId} style={{ position: "absolute", left: st.x * s, top: st.y * s, transform: `rotate(${st.rotation}deg)`, zIndex: 5, pointerEvents: "none" }}>
+              <div key={st.instanceId} style={{ position: "absolute", left: st.x * s, top: st.y * s, transform: `rotate(${st.rotation}deg)`, zIndex: 5 + index, pointerEvents: "none" }}>
                 <StickerEl id={st.type} scale={st.scale * s} />
               </div>
             )
@@ -788,6 +795,13 @@ export default function App() {
   const moveSticker   = (id: string, x: number, y: number) => setPlacedStickers(p => p.map(s => s.instanceId === id ? { ...s, x, y } : s));
   const scaleSticker  = (id: string, f: number)            => setPlacedStickers(p => p.map(s => s.instanceId === id ? { ...s, scale: Math.min(2.5, Math.max(0.35, s.scale * f)) } : s));
   const rotateSticker = (id: string, degrees: number)      => setPlacedStickers(p => p.map(s => s.instanceId === id ? { ...s, rotation: s.rotation + degrees } : s));
+  const toggleStickerLayer = (id: string) => setPlacedStickers(prev => {
+    const index = prev.findIndex(sticker => sticker.instanceId === id);
+    if (index < 0) return prev;
+    const sticker = prev[index];
+    const others = prev.filter(item => item.instanceId !== id);
+    return index === prev.length - 1 ? [sticker, ...others] : [...others, sticker];
+  });
 
   const uploadPhoto = useCallback(async (participantId: string) => {
     if (!supabase || !photoFile) return photo;
@@ -1290,7 +1304,7 @@ export default function App() {
                       card={{ id: "preview", name, photo, email, profession, interests, skills, futureInterests, futureBets, placedStickers, accentColor: cardBg, cardBg }}
                       scale={1.3}
                       editMode placedStickers={placedStickers} containerRef={cardEditorRef}
-                      onRemove={removeSticker} onMove={moveSticker} onScale={scaleSticker} onRotate={rotateSticker}
+                      onRemove={removeSticker} onMove={moveSticker} onScale={scaleSticker} onRotate={rotateSticker} onLayerToggle={toggleStickerLayer}
                     />
                   </div>
                 </motion.div>
