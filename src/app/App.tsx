@@ -1500,56 +1500,50 @@ export default function App() {
 
   const SharedChrome = () => (
     <>
-      {/* Toolbar */}
-      <div style={{ position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", alignItems: "center", gap: 8, padding: "8px 10px 8px 14px", borderRadius: 99, background: DARK, whiteSpace: "nowrap" }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: "rgba(255,255,255,0.6)", fontFamily: F }}>
-          {visibleCards.length}{filterSkills.length > 0 ? `/${cards.length}` : ""} persone
-        </span>
-        <div style={{ padding: "4px 10px", borderRadius: 99, fontSize: 11, fontWeight: 700, background: ORANGE, color: DARK, fontFamily: FB }}>Live</div>
-        <button
-          onClick={() => setFilterOpen(true)}
-          aria-label="Filtra per skill"
-          style={{
-            position: "relative",
-            width: 30,
-            height: 30,
-            borderRadius: "50%",
-            background: filterSkills.length > 0 ? ORANGE : "rgba(255,255,255,0.08)",
-            border: "none",
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            color: filterSkills.length > 0 ? DARK : "rgba(255,255,255,0.68)",
-          }}>
-          <SlidersHorizontal size={15} color={filterSkills.length > 0 ? DARK : "rgba(255,255,255,0.68)"} />
-          {filterSkills.length > 0 && (
-            <span style={{ position: "absolute", top: -3, right: -3, width: 14, height: 14, borderRadius: "50%", background: "#fff", color: DARK, fontSize: 9, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FB, lineHeight: 1 }}>
-              {filterSkills.length}
-            </span>
-          )}
-        </button>
-      </div>
-
       {isPeopleView && (
-        <div style={{ position: "fixed", top: 64, left: "50%", transform: "translateX(-50%)", zIndex: 39, width: 164, height: 42, borderRadius: 99, background: "rgba(30,30,30,0.92)", padding: 4, display: "grid", gridTemplateColumns: "1fr 1fr", overflow: "hidden", boxShadow: "0 10px 28px rgba(0,0,0,0.22)" }}>
-          <motion.div
-            aria-hidden
-            animate={{ x: viewMode === "stack" ? 78 : 0 }}
-            transition={{ type: "spring", stiffness: 520, damping: 34 }}
-            style={{ position: "absolute", top: 4, left: 4, width: 78, height: 34, borderRadius: 99, background: ORANGE }}
-          />
+        <div style={{ position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)", zIndex: 40, display: "flex", alignItems: "center", gap: 8, padding: 4, borderRadius: 99, background: "rgba(30,30,30,0.94)", boxShadow: "0 10px 28px rgba(0,0,0,0.22)" }}>
+          <div style={{ position: "relative", width: 164, height: 42, borderRadius: 99, background: "rgba(255,255,255,0.08)", padding: 4, display: "grid", gridTemplateColumns: "1fr 1fr", overflow: "hidden" }}>
+            <motion.div
+              aria-hidden
+              animate={{ x: viewMode === "stack" ? 78 : 0 }}
+              transition={{ type: "spring", stiffness: 520, damping: 34 }}
+              style={{ position: "absolute", top: 4, left: 4, width: 78, height: 34, borderRadius: 99, background: ORANGE }}
+            />
+            <button
+              onClick={() => { setViewMode("board"); setStackIndex(0); }}
+              aria-label="Vista board"
+              style={{ position: "relative", zIndex: 1, border: "none", background: "transparent", color: viewMode === "board" ? DARK : "rgba(255,255,255,0.64)", display: "flex", alignItems: "center", justifyContent: "center", gap: 5, cursor: "pointer", padding: 0, fontSize: 12, fontWeight: 900, fontFamily: FB }}>
+              <LayoutGrid size={14} /> Board
+            </button>
+            <button
+              onClick={() => { setViewMode("stack"); setStackIndex(0); }}
+              aria-label="Vista card"
+              style={{ position: "relative", zIndex: 1, border: "none", background: "transparent", color: viewMode === "stack" ? DARK : "rgba(255,255,255,0.64)", display: "flex", alignItems: "center", justifyContent: "center", gap: 5, cursor: "pointer", padding: 0, fontSize: 12, fontWeight: 900, fontFamily: FB }}>
+              <Layers size={14} /> Stack
+            </button>
+          </div>
           <button
-            onClick={() => { setViewMode("board"); setStackIndex(0); }}
-            aria-label="Vista board"
-            style={{ position: "relative", zIndex: 1, border: "none", background: "transparent", color: viewMode === "board" ? DARK : "rgba(255,255,255,0.64)", display: "flex", alignItems: "center", justifyContent: "center", gap: 5, cursor: "pointer", padding: 0, fontSize: 12, fontWeight: 900, fontFamily: FB }}>
-            <LayoutGrid size={14} /> Board
-          </button>
-          <button
-            onClick={() => { setViewMode("stack"); setStackIndex(0); }}
-            aria-label="Vista card"
-            style={{ position: "relative", zIndex: 1, border: "none", background: "transparent", color: viewMode === "stack" ? DARK : "rgba(255,255,255,0.64)", display: "flex", alignItems: "center", justifyContent: "center", gap: 5, cursor: "pointer", padding: 0, fontSize: 12, fontWeight: 900, fontFamily: FB }}>
-            <Layers size={14} /> Stack
+            onClick={() => setFilterOpen(true)}
+            aria-label="Filtra per skill"
+            style={{
+              position: "relative",
+              width: 42,
+              height: 42,
+              borderRadius: "50%",
+              background: filterSkills.length > 0 ? ORANGE : "rgba(255,255,255,0.08)",
+              border: "none",
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: filterSkills.length > 0 ? DARK : "rgba(255,255,255,0.68)",
+            }}>
+            <SlidersHorizontal size={18} color={filterSkills.length > 0 ? DARK : "rgba(255,255,255,0.68)"} />
+            {filterSkills.length > 0 && (
+              <span style={{ position: "absolute", top: -2, right: -2, width: 16, height: 16, borderRadius: "50%", background: "#fff", color: DARK, fontSize: 9, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FB, lineHeight: 1 }}>
+                {filterSkills.length}
+              </span>
+            )}
           </button>
         </div>
       )}
@@ -2042,7 +2036,7 @@ export default function App() {
     <div style={{ width: "100vw", height: "100dvh", overflow: "hidden", background: DARK, fontFamily: F, display: "flex", flexDirection: "column", alignItems: "center" }}>
 
       {/* Card deck — fills available space between the top controls and bottom tabs */}
-      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", paddingTop: 116 }}>
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", paddingTop: 88 }}>
         {visibleCards.length === 0 ? (
           <div style={{ color: "rgba(255,255,255,0.3)", fontSize: 16, textAlign: "center" }}>
             <div style={{ fontSize: 40, marginBottom: 12 }}>🔍</div>
